@@ -4,56 +4,16 @@ import {
   Users,
   BarChart,
   Github,
-  Twitter,
   Linkedin,
 } from "lucide-react";
+import Navbar from "./Navbar"; // Import the new Navbar component
 
 const HomePage = () => {
   return (
     // Full screen container
     <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* --- Header --- */}
-      <header className="w-full bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <a href="#" className="flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-8 h-8 text-green-500"
-            >
-              <path d="M11.25,4.5A5.25,5.25,0,0,0,6,9.75v.25a.75.75,0,0,0,1.5,0V9.75a3.75,3.75,0,0,1,7.5,0v.25a.75.75,0,0,0,1.5,0V9.75A5.25,5.25,0,0,0,11.25,4.5Z" />
-              <path
-                fillRule="evenodd"
-                d="M6.16,12.47a.75.75,0,0,1,1.06,0l1.22,1.22a.75.75,0,0,0,1.06,0l2.72-2.72a.75.75,0,0,1,1.06,1.06l-2.72,2.72a2.25,2.25,0,0,1-3.18,0l-1.22-1.22a.75.75,0,0,1,0-1.06ZM18,10.5a.75.75,0,0,1,.75.75v8.25a.75.75,0,0,1-1.5,0V11.25A.75.75,0,0,1,18,10.5Z"
-                clipRule="evenodd"
-              />
-              <path d="M4.5,12.75a.75.75,0,0,0,0,1.5h.75a.75.75,0,0,0,0-1.5H4.5Z" />
-              <path d="M6,15.75a.75.75,0,0,1,.75-.75h.75a.75.75,0,0,1,0,1.5H6.75A.75.75,0,0,1,6,15.75Z" />
-            </svg>
-            <span className="text-2xl font-bold text-gray-800">Grocefy</span>
-          </a>
-          <nav className="hidden md:flex gap-8">
-            <a href="#features" className="text-gray-600 hover:text-green-500">
-              Features
-            </a>
-            <a href="#how" className="text-gray-600 hover:text-green-500">
-              How It Works
-            </a>
-            <a href="#contact" className="text-gray-600 hover:text-green-500">
-              Contact
-            </a>
-          </nav>
-          <div className="flex gap-4">
-            <button className="px-5 py-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition">
-              Login
-            </button>
-            <button className="px-5 py-2 bg-green-400 text-gray-900 font-semibold rounded-full shadow-md hover:shadow-lg transition">
-              Sign Up
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Use the Navbar component here */}
+      <Navbar />
 
       {/* --- Hero Section --- */}
       <section className="flex-1 flex items-center justify-center py-16 md:py-20">
@@ -91,7 +51,9 @@ const HomePage = () => {
                   <p className="text-gray-400 text-sm">Chicken Breast</p>
                 </div>
                 <div className="w-full bg-green-500 p-3 rounded-lg mt-auto shadow-lg">
-                  <p className="text-white font-semibold text-center">+ Add Item</p>
+                  <p className="text-white font-semibold text-center">
+                    + Add Item
+                  </p>
                 </div>
               </div>
             </div>
@@ -143,9 +105,22 @@ const HomePage = () => {
             &copy; {new Date().getFullYear()} Grocefy. All rights reserved.
           </p>
           <div className="flex gap-4 text-gray-700">
-            <Github size={24} />
-            <Twitter size={24} />
-            <Linkedin size={24} />
+            <a
+              href="https://github.com/saachi032"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-green-500 transition"
+            >
+              <Github size={24} />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/saachi-mishra-51362229b/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-green-500 transition"
+            >
+              <Linkedin size={24} />
+            </a>
           </div>
         </div>
       </footer>
