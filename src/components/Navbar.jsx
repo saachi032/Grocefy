@@ -1,11 +1,16 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <header className="w-full bg-white shadow-sm sticky top-0 z-50">
+    <header className="w-full bg-gray-800 sticky top-0 z-50">
       <div className="mx-auto px-6 py-6 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2">
+        {/* Added transition and transform classes for the hover effect */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 transition transform hover:scale-105"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -21,39 +26,45 @@ const Navbar = () => {
             <path d="M4.5,12.75a.75.75,0,0,0,0,1.5h.75a.75.75,0,0,0,0-1.5H4.5Z" />
             <path d="M6,15.75a.75.75,0,0,1,.75-.75h.75a.75.75,0,0,1,0,1.5H6.75A.75.75,0,0,1,6,15.75Z" />
           </svg>
-          <span className="text-4xl font-bold text-gray-800">Grocefy</span>
-        </a>
+          <span className="text-4xl font-bold text-white">Grocefy</span>
+        </Link>
 
         {/* Center Navigation */}
         <nav className="hidden md:flex gap-12 absolute left-1/2 transform -translate-x-1/2">
           <a
-            href="#features"
-            className="text-xl text-gray-600 hover:text-green-500 font-medium transition"
+            href="/#features"
+            className="text-xl text-gray-300 hover:text-green-500 font-medium transition"
           >
             Features
           </a>
           <a
-            href="#how"
-            className="text-xl text-gray-600 hover:text-green-500 font-medium transition"
+            href="/#how"
+            className="text-xl text-gray-300 hover:text-green-500 font-medium transition"
           >
             How It Works
           </a>
           <a
-            href="#contact"
-            className="text-xl text-gray-600 hover:text-green-500 font-medium transition"
+            href="/#contact"
+            className="text-xl text-gray-300 hover:text-green-500 font-medium transition"
           >
             Contact
           </a>
         </nav>
 
         {/* Right Side Actions */}
-        <div className="flex gap-4">
-          <button className="px-5 py-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white font-medium transition">
+        <div className="flex items-center gap-4">
+          <Link
+            to="/login"
+            className="px-5 py-2 border border-gray-400 text-gray-300 rounded-full hover:bg-gray-300 hover:text-gray-900 font-medium transition transform hover:scale-105 flex items-center"
+          >
             Login
-          </button>
-          <button className="px-5 py-2 bg-green-400 text-gray-900 font-semibold rounded-full shadow-md hover:shadow-lg transition">
+          </Link>
+          <Link
+            to="/signup"
+            className="px-5 py-2 bg-green-400 text-gray-900 font-semibold rounded-full shadow-md hover:shadow-lg transition transform hover:scale-105 hover:bg-green-500 flex items-center"
+          >
             Sign Up
-          </button>
+          </Link>
         </div>
       </div>
     </header>

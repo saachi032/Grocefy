@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   ShoppingCart,
   Users,
@@ -6,16 +7,14 @@ import {
   Github,
   Linkedin,
 } from "lucide-react";
-import Navbar from "./Navbar"; // Import the new Navbar component
+import Navbar from "./Navbar";
 
 const HomePage = () => {
   return (
-    // Full screen container
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Use the Navbar component here */}
+    // Added the 'animate-fadeInUp' class for the page transition
+    <div className="flex flex-col min-h-screen bg-gray-50 animate-fadeInUp">
       <Navbar />
 
-      {/* --- Hero Section --- */}
       <section className="flex-1 flex items-center justify-center py-16 md:py-20">
         <div className="w-full max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-12">
           <div className="flex-1 text-center md:text-left">
@@ -27,9 +26,12 @@ const HomePage = () => {
               Grocefy helps you and your family stay on top of grocery lists,
               track expenses, and manage household needs — all in one app.
             </p>
-            <button className="px-8 py-4 bg-green-400 text-gray-900 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition">
+            <Link
+              to="/signup"
+              className="inline-block px-8 py-4 bg-green-400 text-gray-900 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition transform hover:scale-105 hover:bg-green-500"
+            >
               Get Started for Free
-            </button>
+            </Link>
           </div>
           <div className="flex-1 flex justify-center">
             <div className="w-72 h-[32rem] bg-white rounded-3xl shadow-2xl border-4 border-gray-200 p-4 transition-transform duration-300 hover:scale-105 flex flex-col">
@@ -61,13 +63,12 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- How It Works Section --- */}
       <section id="how" className="bg-white py-24 border-y flex-shrink-0">
         <div className="max-w-7xl mx-auto px-6">
           <h3 className="text-4xl font-bold text-center mb-16">How It Works</h3>
           <div className="flex flex-wrap justify-center gap-10">
             <div className="w-80 p-8 rounded-xl shadow-md text-center hover:shadow-xl transition">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center text-green-500">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
                 <Users size={40} />
               </div>
               <h4 className="text-2xl font-semibold mb-3">Add Family</h4>
@@ -86,7 +87,7 @@ const HomePage = () => {
               </p>
             </div>
             <div className="w-80 p-8 rounded-xl shadow-md text-center hover:shadow-xl transition">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center text-green-500">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-purple-100 flex items-center justify-center text-purple-500">
                 <BarChart size={40} />
               </div>
               <h4 className="text-2xl font-semibold mb-3">Track Expenses</h4>
@@ -98,29 +99,76 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* --- Footer --- */}
-      <footer className="w-full bg-gray-100 py-12 flex-shrink-0 mt-auto">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-6">
-          <p className="text-gray-700">
-            &copy; {new Date().getFullYear()} Grocefy. All rights reserved.
-          </p>
-          <div className="flex gap-4 text-gray-700">
-            <a
-              href="https://github.com/saachi032"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-green-500 transition"
-            >
-              <Github size={24} />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/saachi-mishra-51362229b/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-green-500 transition"
-            >
-              <Linkedin size={24} />
-            </a>
+      <footer className="w-full bg-gray-800 text-gray-300 py-12 px-6 mt-auto">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className="md:col-span-1">
+              <div className="flex items-center gap-2 mb-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24"
+                  fill="currentColor"
+                  className="w-8 h-8 text-green-500"
+                >
+                  <path d="M11.25,4.5A5.25,5.25,0,0,0,6,9.75v.25a.75.75,0,0,0,1.5,0V9.75a3.75,3.75,0,0,1,7.5,0v.25a.75.75,0,0,0,1.5,0V9.75A5.25,5.25,0,0,0,11.25,4.5Z" />
+                  <path d="M6.16,12.47a.75.75,0,0,1,1.06,0l1.22,1.22a.75.75,0,0,0,1.06,0l2.72-2.72a.75.75,0,0,1,1.06,1.06l-2.72,2.72a2.25,2.25,0,0,1-3.18,0l-1.22-1.22a.75.75,0,0,1,0-1.06ZM18,10.5a.75.75,0,0,1,.75.75v8.25a.75.75,0,0,1-1.5,0V11.25A.75.75,0,0,1,18,10.5Z" />
+                </svg>
+                <span className="text-2xl font-bold text-white">Grocefy</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                Making grocery management simple for families everywhere.
+              </p>
+            </div>
+
+            <div>
+              <h5 className="font-semibold text-white mb-4">Product</h5>
+              <ul className="space-y-3">
+                <li><a href="#features" className="hover:text-green-500 transition">Features</a></li>
+                <li><a href="#how" className="hover:text-green-500 transition">How It Works</a></li>
+                <li><a href="#" className="hover:text-green-500 transition">Pricing</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 className="font-semibold text-white mb-4">Company</h5>
+              <ul className="space-y-3">
+                <li><a href="#" className="hover:text-green-500 transition">About Us</a></li>
+                <li><a href="#" className="hover:text-green-500 transition">Contact</a></li>
+                <li><a href="#" className="hover:text-green-500 transition">Careers</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 className="font-semibold text-white mb-4">Legal</h5>
+              <ul className="space-y-3">
+                <li><a href="#" className="hover:text-green-500 transition">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-green-500 transition">Terms of Service</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-8 pt-8 border-t border-gray-700 flex flex-col items-center gap-4">
+            <div className="flex gap-6 text-gray-400">
+              <a
+                href="https://github.com/saachi032"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-green-500 transition"
+              >
+                <Github size={24} />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/saachi-mishra-51362229b/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-green-500 transition"
+              >
+                <Linkedin size={24} />
+              </a>
+            </div>
+            <p className="text-gray-500 text-sm">
+              &copy; {new Date().getFullYear()} Grocefy. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>

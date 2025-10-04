@@ -15,3 +15,21 @@
 button {
   cursor: pointer;
 }
+/* Add this to the end of your src/App.css file */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s ease-out forwards;
+
+}
