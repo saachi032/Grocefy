@@ -2,8 +2,10 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,jsx,ts,tsx}", // <-- make sure this is here
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  // This line enables class-based dark mode
+  darkMode: 'class',
   theme: {
     extend: {},
   },

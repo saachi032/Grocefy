@@ -23,7 +23,7 @@ const LoginPage = () => {
     setError("");
     alert("Login Successful! Redirecting...");
     
-    login();
+    login(formData);
     navigate('/home');
   };
 
