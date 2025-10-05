@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ClipboardList } from "lucide-react";
+import { ShoppingCart, ShoppingBasket } from "lucide-react"; 
 import { useAuth } from "../context/AuthContext.jsx";
 
 const LoginPage = () => {
@@ -21,9 +21,8 @@ const LoginPage = () => {
       return;
     }
     setError("");
-    alert("Login Successful! Redirecting...");
     
-    login(formData);
+    login(formData); 
     navigate('/home');
   };
 
@@ -34,19 +33,7 @@ const LoginPage = () => {
           <div className="w-full max-w-md mx-auto">
             <div className="mb-6 flex justify-center">
               <Link to="/" className="flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24"
-                  fill="currentColor"
-                  className="w-10 h-10 text-green-500"
-                >
-                  <path d="M11.25,4.5A5.25,5.25,0,0,0,6,9.75v.25a.75.75,0,0,0,1.5,0V9.75a3.75,3.75,0,0,1,7.5,0v.25a.75.75,0,0,0,1.5,0V9.75A5.25,5.25,0,0,0,11.25,4.5Z" />
-                  <path
-                    fillRule="evenodd"
-                    d="M6.16,12.47a.75.75,0,0,1,1.06,0l1.22,1.22a.75.75,0,0,0,1.06,0l2.72-2.72a.75.75,0,0,1,1.06,1.06l-2.72,2.72a2.25,2.25,0,0,1-3.18,0l-1.22-1.22a.75.75,0,0,1,0-1.06ZM18,10.5a.75.75,0,0,1,.75.75v8.25a.75.75,0,0,1-1.5,0V11.25A.75.75,0,0,1,18,10.5Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <ShoppingBasket className="w-10 h-10 text-green-500" />
                 <span className="text-3xl font-bold text-gray-800">Grocefy</span>
               </Link>
             </div>
@@ -99,7 +86,7 @@ const LoginPage = () => {
         </div>
 
         <div className="hidden md:flex w-1/2 bg-gray-900 text-white flex-col justify-center items-center p-12 relative overflow-hidden">
-          <ClipboardList strokeWidth={0.5} className="absolute -right-20 -bottom-20 w-80 h-80 text-white/5" />
+          <ShoppingCart strokeWidth={0.5} className="absolute -right-20 -bottom-20 w-80 h-80 text-white/5" />
           <div className="max-w-md w-full z-10">
             <h2 className="text-4xl font-bold leading-tight">Pick up where <br/> you left off.</h2>
             <p className="mt-4 text-gray-300">Access your shared lists, track recent expenses, and continue managing your household needs seamlessly.</p>
@@ -115,3 +102,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+

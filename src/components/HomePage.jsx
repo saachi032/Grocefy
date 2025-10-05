@@ -6,15 +6,16 @@ import {
   BarChart,
   Github,
   Linkedin,
+  ShoppingBasket,
 } from "lucide-react";
 import Navbar from "./Navbar";
 
 const HomePage = () => {
   return (
-    // Added the 'animate-fadeInUp' class for the page transition
     <div className="flex flex-col min-h-screen bg-gray-50 animate-fadeInUp">
       <Navbar />
 
+      {/* Hero and "How It Works" sections remain unchanged */}
       <section className="flex-1 flex items-center justify-center py-16 md:py-20">
         <div className="w-full max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-12">
           <div className="flex-1 text-center md:text-left">
@@ -103,18 +104,11 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-1">
-              <div className="flex items-center gap-2 mb-3">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24"
-                  fill="currentColor"
-                  className="w-8 h-8 text-green-500"
-                >
-                  <path d="M11.25,4.5A5.25,5.25,0,0,0,6,9.75v.25a.75.75,0,0,0,1.5,0V9.75a3.75,3.75,0,0,1,7.5,0v.25a.75.75,0,0,0,1.5,0V9.75A5.25,5.25,0,0,0,11.25,4.5Z" />
-                  <path d="M6.16,12.47a.75.75,0,0,1,1.06,0l1.22,1.22a.75.75,0,0,0,1.06,0l2.72-2.72a.75.75,0,0,1,1.06,1.06l-2.72,2.72a2.25,2.25,0,0,1-3.18,0l-1.22-1.22a.75.75,0,0,1,0-1.06ZM18,10.5a.75.75,0,0,1,.75.75v8.25a.75.75,0,0,1-1.5,0V11.25A.75.75,0,0,1,18,10.5Z" />
-                </svg>
-                <span className="text-2xl font-bold text-white">Grocefy</span>
-              </div>
+               <Link to="/" className="flex items-center gap-2 mb-2">
+                <ShoppingBasket className="w-10 h-10 text-green-500" />
+                {/* --- FIXED: Text color changed to white --- */}
+                <span className="text-3xl font-bold text-white">Grocefy</span>
+              </Link>
               <p className="text-gray-400 text-sm">
                 Making grocery management simple for families everywhere.
               </p>
