@@ -1,4 +1,5 @@
 Grocefy 🛒
+
 Grocefy is a modern, responsive web application designed to simplify grocery management for individuals and families. Track your shopping lists, monitor your expenses, and collaborate with family members in one intuitive dashboard.
 
 ✨ Project Status
