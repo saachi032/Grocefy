@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import UserNavbar from './UserNavbar.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import {
-  ClipboardList, Wallet, Users, CheckCircle2, ShoppingCart, BarChart, Plus, Download,
+  ClipboardList, Wallet, Users, CheckCircle2, ShoppingCart, BarChart, Plus,
 } from 'lucide-react';
 
-// MOCK DATA: In a real app, this would come from an API call in a useEffect hook.
+// MOCK DATA
 const mockDashboardData = {
   location: {
     city: 'Navi Mumbai',
-    temp: 29,
-    date: 'October 5, 2025',
+    temp: 28,
+    date: 'October 11, 2025',
   },
   overviewStats: [
     { id: 1, icon: <ClipboardList />, title: "Total Lists", value: "5 Active", link: "/lists" },
@@ -40,12 +40,11 @@ const mockDashboardData = {
   ],
 };
 
-// --- SUB-COMPONENTS for a cleaner main component ---
+// --- SUB-COMPONENTS ---
 
-const StatCard = ({ icon, title, value, link, delay }) => (
+const StatCard = ({ icon, title, value }) => (
   <div
-    className="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg transition-transform duration-300 hover:-translate-y-2 cursor-pointer animate-fadeInUp"
-    style={{ animationDelay: `${delay * 100}ms` }}
+    className="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg transition-transform duration-300 hover:-translate-y-2 cursor-pointer"
   >
     <div className="flex justify-between items-start">
       <div className="flex flex-col">
@@ -57,8 +56,8 @@ const StatCard = ({ icon, title, value, link, delay }) => (
   </div>
 );
 
-const GoalProgressBar = ({ title, percentage, delay }) => (
-    <div className="animate-fadeInUp" style={{ animationDelay: `${delay * 100}ms` }}>
+const GoalProgressBar = ({ title, percentage }) => (
+    <div>
     <div className="flex justify-between items-center mb-1">
       <span className="text-sm font-medium text-gray-700">{title}</span>
       <span className="text-sm font-bold text-green-600">{percentage}%</span>
@@ -74,17 +73,7 @@ const GoalProgressBar = ({ title, percentage, delay }) => (
 
 const UserHome = () => {
   const { user } = useAuth();
-  const [dashboardData, setDashboardData] = useState(null);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setDashboardData(mockDashboardData);
-    }, 500);
-  }, []);
-
-  if (!dashboardData) {
-    return <div className="bg-gray-100 min-h-screen flex items-center justify-center text-gray-800">Loading Dashboard...</div>;
-  }
+  const [dashboardData, setDashboardData] = useState(mockDashboardData);
 
   const { location, overviewStats, insights, recentLists, familyActivity, weeklyGoals } = dashboardData;
 
@@ -94,7 +83,7 @@ const UserHome = () => {
 
       <main className="w-full max-w-7xl mx-auto px-6 py-12">
         
-        <section className="relative bg-white p-8 rounded-2xl mb-12 animate-fadeInUp shadow-md">
+        <section className="relative bg-white p-8 rounded-2xl mb-12 shadow-md">
           <div className="absolute top-6 right-6 text-right text-gray-500 text-sm">
             <p>📍 {location.city} | {location.temp}°C</p>
             <p>{location.date}</p>
@@ -103,13 +92,28 @@ const UserHome = () => {
           <p className="text-gray-600 mt-2">Track groceries, monitor expenses, and keep your family organized.</p>
         </section>
 
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <button className="flex flex-col items-center justify-center gap-3 p-8 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-500 transition-all transform hover:-translate-y-1 shadow-lg">
+            <Plus size={32}/>
+            <span className="text-xl">Create List</span>
+          </button>
+          <button className="flex flex-col items-center justify-center gap-3 p-8 bg-white text-gray-800 font-bold rounded-2xl hover:bg-gray-200 transition-colors transform hover:-translate-y-1 shadow-lg border border-gray-200">
+            <Wallet size={32}/>
+            <span className="text-xl">Add Expense</span>
+          </button>
+          <button className="flex flex-col items-center justify-center gap-3 p-8 bg-white text-gray-800 font-bold rounded-2xl hover:bg-gray-200 transition-colors transform hover:-translate-y-1 shadow-lg border border-gray-200">
+            <Users size={32}/>
+            <span className="text-xl">Invite Family</span>
+          </button>
+        </section>
+
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {overviewStats.map((stat, index) => (
-            <StatCard key={stat.id} {...stat} delay={index + 1} />
+          {overviewStats.map((stat) => (
+            <StatCard key={stat.id} {...stat} />
           ))}
         </section>
         
-        <section className="mb-12 animate-fadeInUp" style={{ animationDelay: '500ms' }}>
+        <section className="mb-12">
             <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6">
                 {insights.map((insight, index) => (
                     <div key={index} className="flex-shrink-0 bg-white p-3 rounded-lg border border-gray-200 hover:border-green-500 transition-colors">
@@ -120,11 +124,11 @@ const UserHome = () => {
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-12">
-          <div className="lg:col-span-3 bg-white p-6 rounded-2xl animate-fadeInUp shadow-md" style={{ animationDelay: '600ms' }}>
+          <div className="lg:col-span-3 bg-white p-6 rounded-2xl shadow-md">
             <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4"><BarChart /> Spending Overview</h2>
             <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">Chart will be displayed here</div>
           </div>
-          <div className="lg:col-span-2 bg-white p-6 rounded-2xl animate-fadeInUp shadow-md" style={{ animationDelay: '700ms' }}>
+          <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-md">
             <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4"><ShoppingCart /> Recent Lists</h2>
             <div className="space-y-3">
               {recentLists.map(list => (
@@ -138,7 +142,7 @@ const UserHome = () => {
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            <div className="bg-white p-6 rounded-2xl animate-fadeInUp shadow-md" style={{ animationDelay: '800ms' }}>
+            <div className="bg-white p-6 rounded-2xl shadow-md">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">👨‍👩‍👧 Family Highlights</h2>
                 <div className="space-y-4">
                     {familyActivity.map(activity => (
@@ -149,26 +153,17 @@ const UserHome = () => {
                     ))}
                 </div>
             </div>
-            <div className="bg-white p-6 rounded-2xl animate-fadeInUp shadow-md" style={{ animationDelay: '900ms' }}>
+            <div className="bg-white p-6 rounded-2xl shadow-md">
                 <h2 className="text-xl font-bold text-gray-800 mb-4">🎯 This Week’s Goals</h2>
                 <div className="space-y-4">
-                    {weeklyGoals.map((goal, index) => (
-                        <GoalProgressBar key={goal.id} {...goal} delay={index} />
+                    {weeklyGoals.map((goal) => (
+                        <GoalProgressBar key={goal.id} {...goal} />
                     ))}
                 </div>
                 <div className="mt-6 p-4 text-center bg-green-100 text-green-700 rounded-lg">
                     <p>Great progress! You’re managing groceries like a pro 🏆</p>
                 </div>
             </div>
-        </section>
-
-        <section className="text-center py-8 animate-fadeInUp" style={{ animationDelay: '1000ms' }}>
-          <div className="inline-flex items-center gap-4 bg-white p-3 rounded-xl shadow-md">
-            <button className="flex items-center gap-2 px-5 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-500 transition-all transform hover:scale-105"><Plus size={20}/> Add List</button>
-            <button className="flex items-center gap-2 px-5 py-3 bg-gray-200 text-gray-800 font-bold rounded-lg hover:bg-gray-300 transition-colors"><Wallet size={20}/> Add Expense</button>
-            <button className="flex items-center gap-2 px-5 py-3 bg-gray-200 text-gray-800 font-bold rounded-lg hover:bg-gray-300 transition-colors"><Users size={20}/> Invite Family</button>
-            <button className="flex items-center gap-2 px-5 py-3 bg-gray-200 text-gray-800 font-bold rounded-lg hover:bg-gray-300 transition-colors"><Download size={20}/> Export</button>
-          </div>
         </section>
 
       </main>

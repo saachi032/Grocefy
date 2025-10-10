@@ -12,6 +12,10 @@ import HomePage from './components/HomePage.jsx';
 import SignUpPage from './components/SignUpPage.jsx';
 import LoginPage from './components/LoginPage.jsx';
 import UserHome from './components/UserInterface/UserHome.jsx';
+import Lists from './components/UserInterface/Lists.jsx';
+import Expenses from './components/UserInterface/Expenses.jsx';
+import Family from './components/UserInterface/Family.jsx';
+
 
 // Global Styles
 import './App.css';
@@ -32,6 +36,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserHome />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/lists" 
+            element={
+              <ProtectedRoute>
+                <Lists />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/expenses" 
+            element={
+              <ProtectedRoute>
+                <Expenses />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/family" 
+            element={
+              <ProtectedRoute>
+                <Family />
               </ProtectedRoute>
             } 
           />

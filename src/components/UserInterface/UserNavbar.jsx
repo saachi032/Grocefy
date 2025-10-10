@@ -1,18 +1,24 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingBasket, Bell, LogOut, UserCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 const UserNavbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation(); // Get the current location object
 
   const handleLogout = () => {
     logout();
     navigate("/", { replace: true });
   };
 
-  const navLinks = ["Dashboard", "Lists", "Expenses", "Family"];
+  const navLinks = [
+    { name: "Dashboard", path: "/home" },
+    { name: "Lists", path: "/lists" },
+    { name: "Expenses", path: "/expenses" },
+    { name: "Family", path: "/family" }
+  ];
 
   return (
     <header className="w-full bg-gray-800 sticky top-0 z-50">
@@ -25,16 +31,23 @@ const UserNavbar = () => {
 
         {/* Center: Navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
-            <Link
-              key={link}
-              to={`/${link.toLowerCase()}`}
-              className="text-gray-300 font-medium hover:text-white transition-colors relative group"
-            >
-              {link}
-              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-green-500 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = location.pathname === link.path;
+            return (
+              <Link
+                key={link.name}
+                to={link.path}
+                // If the link is active, make the text white
+                className={`text-gray-300 font-medium hover:text-white transition-colors relative group ${isActive ? 'text-white' : ''}`}
+              >
+                {link.name}
+                <span
+                  // If the link is active, make the underline visible (width 100%)
+                  className={`absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-green-500 transition-all duration-300 group-hover:w-full ${isActive ? 'w-full' : 'w-0'}`}
+                ></span>
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right: User Actions */}
