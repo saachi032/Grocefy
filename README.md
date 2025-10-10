@@ -1,18 +1,39 @@
-# React + Vite
+Grocefy 🛒
+Grocefy is a modern, responsive web application designed to simplify grocery management for individuals and families. Track your shopping lists, monitor your expenses, and collaborate with family members in one intuitive dashboard.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+✨ Project Status
+This project is currently a Work In Progress (WIP). The frontend is being actively developed with a focus on UI/UX and component-based architecture. All data is currently mocked and will be connected to a backend in a future phase.
 
-Currently, two official plugins are available:
+🚀 Key Features
+🏠 Interactive Dashboard: An at-a-glance overview of your active lists, recent expenses, and family activity.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+📝 Smart Grocery Lists: Create, manage, and track the completion status of multiple shopping lists. Includes search, filtering, and quick-action controls.
 
-## React Compiler
+💸 Intuitive Expense Tracker: A powerful, data-driven page to log and visualize your spending.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+Weekly Table View: A clear, concise table of the current week's expenses.
 
-Note: This will impact Vite dev & build performances.
+Interactive Navigation: Easily navigate between weeks with arrows or jump to any date with a calendar picker.
 
-## Expanding the ESLint configuration
+Monthly Overview Chart: A beautiful bar chart to visualize spending patterns for the entire month.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+👨‍👩‍👧 Family Collaboration (Planned): Features for sharing lists and managing household groceries together.
+
+🔐 Secure User Authentication: A foundation for user registration and login functionality.
+
+🛠️ Tech Stack
+This project is built with a modern, component-based frontend stack:
+
+Framework: React.js
+
+Styling: Tailwind CSS
+
+Routing: React Router
+
+Icons: Lucide React
+
+Charting: Recharts
+
+Date Management: date-fns
+
+Calendar UI: React Day Picker
