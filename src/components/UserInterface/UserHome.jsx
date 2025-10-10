@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'; // Import Link for navigation
 import UserNavbar from './UserNavbar.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import {
@@ -7,11 +8,7 @@ import {
 
 // MOCK DATA
 const mockDashboardData = {
-  location: {
-    city: 'Navi Mumbai',
-    temp: 28,
-    date: 'October 11, 2025',
-  },
+  location: { city: 'Navi Mumbai', temp: 28, date: '11-10-2025' },
   overviewStats: [
     { id: 1, icon: <ClipboardList />, title: "Total Lists", value: "5 Active", link: "/lists" },
     { id: 2, icon: <Wallet />, title: "This Month’s Expense", value: "₹3,240", link: "/expenses" },
@@ -22,12 +19,11 @@ const mockDashboardData = {
     "🛍️ You’re running low on 3 items (Milk, Bread, Sugar).",
     "💸 You saved ₹480 compared to last week — nice work!",
     "👨‍👩‍👧 Riya updated ‘Weekly Essentials’ 2 hours ago.",
-    "🔥 90% of your budget used — plan your next purchase carefully.",
   ],
   recentLists: [
-    { id: 1, name: 'Weekly Essentials', items: 15, updated: '2 hours ago', status: 'Active' },
-    { id: 2, name: 'Weekend Party', items: 25, updated: '1 day ago', status: 'Completed' },
-    { id: 3, name: 'Household Cleaning', items: 8, updated: '3 days ago', status: 'Completed' },
+    { id: 1, name: 'Weekly Essentials', items: 15, updated: '2 hours ago' },
+    { id: 2, name: 'Weekend Party', items: 25, updated: '1 day ago' },
+    { id: 3, name: 'Household Cleaning', items: 8, updated: '3 days ago' },
   ],
   familyActivity: [
     { id: 1, avatar: '👩', text: "Riya added 2 items to ‘Family List.’" },
@@ -40,12 +36,8 @@ const mockDashboardData = {
   ],
 };
 
-// --- SUB-COMPONENTS ---
-
 const StatCard = ({ icon, title, value }) => (
-  <div
-    className="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg transition-transform duration-300 hover:-translate-y-2 cursor-pointer"
-  >
+  <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-lg transition-transform duration-300 hover:-translate-y-2 cursor-pointer">
     <div className="flex justify-between items-start">
       <div className="flex flex-col">
         <p className="text-sm text-gray-500">{title}</p>
@@ -68,21 +60,16 @@ const GoalProgressBar = ({ title, percentage }) => (
   </div>
 );
 
-
-// --- MAIN DASHBOARD COMPONENT ---
-
 const UserHome = () => {
   const { user } = useAuth();
-  const [dashboardData, setDashboardData] = useState(mockDashboardData);
+  const [dashboardData] = useState(mockDashboardData);
 
   const { location, overviewStats, insights, recentLists, familyActivity, weeklyGoals } = dashboardData;
 
   return (
     <div className="bg-gray-100 text-gray-800 font-sans">
       <UserNavbar />
-
       <main className="w-full max-w-7xl mx-auto px-6 py-12">
-        
         <section className="relative bg-white p-8 rounded-2xl mb-12 shadow-md">
           <div className="absolute top-6 right-6 text-right text-gray-500 text-sm">
             <p>📍 {location.city} | {location.temp}°C</p>
@@ -92,19 +79,20 @@ const UserHome = () => {
           <p className="text-gray-600 mt-2">Track groceries, monitor expenses, and keep your family organized.</p>
         </section>
 
+        {/* --- ACTION BUTTONS UPDATED --- */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <button className="flex flex-col items-center justify-center gap-3 p-8 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-500 transition-all transform hover:-translate-y-1 shadow-lg">
+          <Link to="/lists/create" className="flex flex-col items-center justify-center gap-3 p-8 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-500 transition-all transform hover:-translate-y-1 shadow-lg">
             <Plus size={32}/>
             <span className="text-xl">Create List</span>
-          </button>
-          <button className="flex flex-col items-center justify-center gap-3 p-8 bg-white text-gray-800 font-bold rounded-2xl hover:bg-gray-200 transition-colors transform hover:-translate-y-1 shadow-lg border border-gray-200">
+          </Link>
+          <Link to="/expenses/add" className="flex flex-col items-center justify-center gap-3 p-8 bg-white text-gray-800 font-bold rounded-2xl hover:bg-gray-200 transition-colors transform hover:-translate-y-1 shadow-lg border border-gray-200">
             <Wallet size={32}/>
             <span className="text-xl">Add Expense</span>
-          </button>
-          <button className="flex flex-col items-center justify-center gap-3 p-8 bg-white text-gray-800 font-bold rounded-2xl hover:bg-gray-200 transition-colors transform hover:-translate-y-1 shadow-lg border border-gray-200">
+          </Link>
+          <Link to="/family/invite" className="flex flex-col items-center justify-center gap-3 p-8 bg-white text-gray-800 font-bold rounded-2xl hover:bg-gray-200 transition-colors transform hover:-translate-y-1 shadow-lg border border-gray-200">
             <Users size={32}/>
             <span className="text-xl">Invite Family</span>
-          </button>
+          </Link>
         </section>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -167,7 +155,6 @@ const UserHome = () => {
         </section>
 
       </main>
-
       <footer className="w-full text-center p-6 text-gray-500 text-sm border-t border-gray-200 mt-8">
         Grocefy © 2025 — Simplify Your Grocery Life.
       </footer>
