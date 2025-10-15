@@ -80,7 +80,7 @@ const UserHome = () => {
         </section>
 
         {/* --- ACTION BUTTONS UPDATED --- */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <section className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-12">
           <Link to="/lists/create" className="flex flex-col items-center justify-center gap-3 p-8 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-500 transition-all transform hover:-translate-y-1 shadow-lg">
             <Plus size={32}/>
             <span className="text-xl">Create List</span>

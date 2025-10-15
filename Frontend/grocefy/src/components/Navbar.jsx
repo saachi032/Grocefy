@@ -4,7 +4,7 @@ import { ShoppingBasket, ShoppingCart } from "lucide-react";
 
 const Navbar = () => {
   return (
-    <header className="w-full bg-gray-800 sticky top-0 z-50">
+    <header className="w-full bg-gray-900 sticky top-0 z-50">
       <div className="mx-auto px-6 py-6 flex items-center justify-between">
          <Link to="/" className="flex items-center gap-2 mb-2">
                 <ShoppingBasket className="w-10 h-10 text-green-500" />
