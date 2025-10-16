@@ -8,15 +8,18 @@ export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-// The provider component
+// Provider component
 export const AuthProvider = ({ children }) => {
-  // Initialize user state by reading from localStorage
+  // Initialize user from localStorage
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('grocefyUser');
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  // Use useEffect to save the user to localStorage whenever it changes
+  // Flag to prevent redirect flicker during logout
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Keep localStorage in sync with user state
   useEffect(() => {
     if (user) {
       localStorage.setItem('grocefyUser', JSON.stringify(user));
@@ -25,23 +28,26 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  // --- Mock Login/Logout Functions ---
-  // In your real app, these would make API calls
-
+  // Mock login
   const login = (userData) => {
-    // For now, we'll just set a mock user
     const mockUser = { name: userData.name || "Saachi", email: userData.email };
     setUser(mockUser);
   };
 
+  // Fixed logout (prevents login flicker)
   const logout = () => {
+    setIsLoggingOut(true);
     setUser(null);
+    // Give React time to unmount protected routes before redirecting
+    setTimeout(() => {
+      setIsLoggingOut(false);
+    }, 400);
   };
 
-  // The value provided to consuming components
   const value = {
     user,
-    isAuthenticated: !!user, // A handy boolean to check if user is logged in
+    isAuthenticated: !!user,
+    isLoggingOut,
     login,
     logout,
   };

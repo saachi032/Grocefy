@@ -29,8 +29,8 @@ import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>      
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
@@ -51,9 +51,9 @@ function App() {
           <Route path="/expenses/add" element={<ProtectedRoute><AddExpense /></ProtectedRoute>} />
           <Route path="/family/create" element={<ProtectedRoute><CreateFamily /></ProtectedRoute>} />
           <Route path="/family/invite" element={<ProtectedRoute><InviteFamily/></ProtectedRoute>} />
-        </Routes>
-      </Router>
+        </Routes>      
     </AuthProvider>
+    </Router>
   );
 }
 

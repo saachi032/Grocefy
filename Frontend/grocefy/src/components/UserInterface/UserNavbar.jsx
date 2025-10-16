@@ -12,11 +12,12 @@ const UserNavbar = () => {
   // --- 2. ADD State for the mobile menu ---
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/", { replace: true });
-  };
-
+ const handleLogout = () => {
+  logout();
+  setTimeout(() => {
+    navigate("/", { replace: true }); // Redirect to public HomePage.jsx
+  }, 250); // small delay (200ms) to allow state update
+};
   const navLinks = [
     { name: "Dashboard", path: "/home" },
     { name: "Lists", path: "/lists" },
