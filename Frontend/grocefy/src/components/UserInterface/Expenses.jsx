@@ -3,7 +3,7 @@ import { format, startOfWeek, endOfWeek, addWeeks, subWeeks, startOfMonth, endOf
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
-import { Link } from 'react-router-dom'; // Import Link here
+import { Link } from 'react-router-dom';
 
 import UserNavbar from './UserNavbar.jsx';
 import { Plus, ChevronLeft, ChevronRight, Calendar, CreditCard, Wallet, Landmark } from 'lucide-react';
@@ -79,7 +79,6 @@ const Expenses = () => {
       <UserNavbar />
       <main className="w-full max-w-5xl mx-auto px-4 py-12">
         <header className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-            {/* --- THIS IS THE CHANGED PART --- */}
             <Link to="/expenses/add" className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-500 transition-transform transform hover:scale-105 shadow-lg order-1 md:order-none">
                 <Plus size={24} />
                 <span className="text-lg">Add Expense</span>
@@ -106,8 +105,10 @@ const Expenses = () => {
             </div>
         </header>
 
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-          <table className="w-full">
+        {/* --- CHANGED: overflow-hidden changed to overflow-x-auto --- */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+          {/* --- CHANGED: Added min-w-[640px] to force scroll on small screens --- */}
+          <table className="w-full min-w-[640px]">
             <thead className="bg-gray-50 text-left text-sm font-semibold text-gray-600">
               <tr>
                 <th className="p-4">Date</th>
@@ -121,11 +122,13 @@ const Expenses = () => {
               {weekExpenses.length > 0 ? (
                 weekExpenses.map(exp => (
                   <tr key={exp.id} className="border-b border-gray-100">
-                    <td className="p-4 text-gray-700">{format(new Date(exp.date), 'dd-MM-yyyy')}</td>
-                    <td className="p-4 text-gray-700">{format(new Date(exp.date), 'EEEE')}</td>
+                    {/* --- CHANGED: Added whitespace-nowrap --- */}
+                    <td className="p-4 text-gray-700 whitespace-nowrap">{format(new Date(exp.date), 'dd-MM-yyyy')}</td>
+                    <td className="p-4 text-gray-700 whitespace-nowrap">{format(new Date(exp.date), 'EEEE')}</td>
                     <td className="p-4 font-semibold text-gray-900">{exp.item}</td>
                     <td className="p-4"><PaymentInfo method={exp.method} /></td>
-                    <td className="p-4 font-bold text-gray-900 text-right">₹{exp.amount.toLocaleString('en-IN')}</td>
+                    {/* --- CHANGED: Added whitespace-nowrap --- */}
+                    <td className="p-4 font-bold text-gray-900 text-right whitespace-nowrap">₹{exp.amount.toLocaleString('en-IN')}</td>
                   </tr>
                 ))
               ) : (
@@ -164,4 +167,4 @@ const Expenses = () => {
   );
 };
 
-export default Expenses; 
+export default Expenses;
