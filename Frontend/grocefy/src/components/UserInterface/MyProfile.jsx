@@ -91,7 +91,7 @@ const MyProfile = () => {
 
     const handleLogout = () => {
         if (window.confirm("Are you sure you want to log out?")) {
-            navigate('/login'); // Redirect to login page
+            navigate('/'); // Redirect to login page
         }
     };
     

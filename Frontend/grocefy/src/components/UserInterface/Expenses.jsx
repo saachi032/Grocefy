@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import UserNavbar from './UserNavbar.jsx';
 import { Plus, ChevronLeft, ChevronRight, Calendar, CreditCard, Wallet, Landmark } from 'lucide-react';
 
-// --- MOCK DATA ---
+// --- MOCK DATA (No changes) ---
 const mockExpenses = [
   { id: 1, date: '2025-10-11', item: 'Grocefy Supermart Haul', method: 'Card', amount: 4850.50 },
   { id: 2, date: '2025-10-11', item: 'Morning Coffee', method: 'UPI', amount: 280.00 },
@@ -28,7 +28,7 @@ const PaymentInfo = ({ method }) => {
         default: Icon = Wallet;
     }
     return (
-        <div className="flex items-center gap-2 text-gray-600">
+        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <Icon size={18} />
             <span>{method}</span>
         </div>
@@ -55,7 +55,7 @@ const Expenses = () => {
     const end = endOfWeek(currentDate, { weekStartsOn: 1 });
     const weekExpenses = mockExpenses
       .filter(exp => new Date(exp.date) >= start && new Date(exp.date) <= end)
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
+      .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort descending
     const weeklyTotal = weekExpenses.reduce((sum, exp) => sum + exp.amount, 0);
     const weekTitle = `${format(start, 'd MMM')} - ${format(end, 'd MMM, yyyy')}`;
     const startMonth = startOfMonth(currentDate);
@@ -75,23 +75,23 @@ const Expenses = () => {
   const goToNextWeek = () => setCurrentDate(addWeeks(currentDate, 1));
 
   return (
-    <div className="bg-gray-100 min-h-screen font-sans">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen font-sans transition-colors duration-300">
       <UserNavbar />
       <main className="w-full max-w-5xl mx-auto px-4 py-12">
         <header className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
-            <Link to="/expenses/add" className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-500 transition-transform transform hover:scale-105 shadow-lg order-1 md:order-none">
-                <Plus size={24} />
+            <Link to="/expenses/add" className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-500 transition-transform transform hover:scale-105 shadow-lg order-1 md:order-none">
+                <Plus size={22} />
                 <span className="text-lg">Add Expense</span>
             </Link>
-            <div className="flex items-center gap-2">
-                <button onClick={goToPreviousWeek} className="p-2 rounded-full hover:bg-gray-200 transition-colors"><ChevronLeft size={24} /></button>
+            <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1 rounded-full border dark:border-gray-700">
+                <button onClick={goToPreviousWeek} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><ChevronLeft size={24} className="text-gray-600 dark:text-gray-300"/></button>
                 <div className="relative">
-                    <button onClick={() => setPickerOpen(!isPickerOpen)} className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
-                        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 text-center w-52 sm:w-auto">{weekTitle}</h1>
-                        <Calendar size={20} className="text-gray-500" />
+                    <button onClick={() => setPickerOpen(!isPickerOpen)} className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 text-center w-52 sm:w-auto">{weekTitle}</h1>
+                        <Calendar size={20} className="text-gray-500 dark:text-gray-400" />
                     </button>
                     {isPickerOpen && (
-                        <div className="absolute top-full mt-2 bg-white rounded-xl shadow-2xl z-20 right-0 md:right-auto md:left-0">
+                        <div className="absolute top-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl z-20 right-0 md:right-auto md:left-0 border dark:border-gray-700">
                             <DayPicker 
                                 mode="single" 
                                 selected={currentDate} 
@@ -101,62 +101,70 @@ const Expenses = () => {
                         </div>
                     )}
                 </div>
-                <button onClick={goToNextWeek} className="p-2 rounded-full hover:bg-gray-200 transition-colors"><ChevronRight size={24} /></button>
+                <button onClick={goToNextWeek} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><ChevronRight size={24} className="text-gray-600 dark:text-gray-300"/></button>
             </div>
         </header>
-
-        {/* --- CHANGED: overflow-hidden changed to overflow-x-auto --- */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
-          {/* --- CHANGED: Added min-w-[640px] to force scroll on small screens --- */}
-          <table className="w-full min-w-[640px]">
-            <thead className="bg-gray-50 text-left text-sm font-semibold text-gray-600">
-              <tr>
-                <th className="p-4">Date</th>
-                <th className="p-4">Day</th>
-                <th className="p-4 w-2/5">Item</th>
-                <th className="p-4">Method</th>
-                <th className="p-4 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {weekExpenses.length > 0 ? (
-                weekExpenses.map(exp => (
-                  <tr key={exp.id} className="border-b border-gray-100">
-                    {/* --- CHANGED: Added whitespace-nowrap --- */}
-                    <td className="p-4 text-gray-700 whitespace-nowrap">{format(new Date(exp.date), 'dd-MM-yyyy')}</td>
-                    <td className="p-4 text-gray-700 whitespace-nowrap">{format(new Date(exp.date), 'EEEE')}</td>
-                    <td className="p-4 font-semibold text-gray-900">{exp.item}</td>
-                    <td className="p-4"><PaymentInfo method={exp.method} /></td>
-                    {/* --- CHANGED: Added whitespace-nowrap --- */}
-                    <td className="p-4 font-bold text-gray-900 text-right whitespace-nowrap">₹{exp.amount.toLocaleString('en-IN')}</td>
+        
+        {/* --- REDESIGNED TABLE CONTAINER --- */}
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              {/* --- STICKY HEADER --- */}
+              <thead className="sticky top-0 bg-gray-100/75 dark:bg-gray-800/75 backdrop-blur-sm">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 tracking-wider">Date</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 tracking-wider">Item</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600 dark:text-gray-300 tracking-wider">Method</th>
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-600 dark:text-gray-300 tracking-wider">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {weekExpenses.length > 0 ? (
+                  weekExpenses.map((exp, index) => (
+                    // --- ALTERNATING & HOVERABLE ROWS ---
+                    <tr key={exp.id} className="transition-colors duration-200 odd:bg-white even:bg-gray-50 dark:odd:bg-gray-900/50 dark:even:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      {/* --- COMPACT PADDING & REFINED TEXT --- */}
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <p className="font-semibold text-gray-800 dark:text-gray-100">{format(new Date(exp.date), 'dd-MM-yyyy')}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{format(new Date(exp.date), 'EEEE')}</p>
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-gray-900 dark:text-white">{exp.item}</td>
+                      <td className="px-4 py-3"><PaymentInfo method={exp.method} /></td>
+                      <td className="px-4 py-3 font-bold text-gray-900 dark:text-gray-100 text-right whitespace-nowrap">
+                        ₹{exp.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center py-16 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900/50">
+                      No expenses recorded for this week.
+                    </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center py-16 text-gray-500">
-                    No expenses recorded for this week.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-            <tfoot className="bg-gray-50 font-bold">
-                <tr>
-                    <td colSpan="4" className="p-4 text-right text-gray-700">Total for the Week:</td>
-                    <td className="p-4 text-right text-lg text-gray-900">₹{weeklyTotal.toLocaleString('en-IN')}</td>
-                </tr>
-            </tfoot>
-          </table>
+                )}
+              </tbody>
+              {/* --- STYLED FOOTER --- */}
+              <tfoot className="bg-gray-100 dark:bg-gray-800 font-semibold">
+                  <tr>
+                      <td colSpan="3" className="px-4 py-3 text-right text-gray-700 dark:text-gray-300">Total for the Week:</td>
+                      <td className="px-4 py-3 text-right text-lg text-gray-900 dark:text-white">
+                        ₹{weeklyTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </td>
+                  </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
         
-        <section className="bg-white p-4 md:p-6 mt-8 rounded-2xl border border-gray-200 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
+        <section className="bg-white dark:bg-gray-800 p-4 md:p-6 mt-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
                 Monthly Overview for {format(currentDate, 'MMMM')}
             </h2>
             <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fill: '#6b7280' }} fontSize={12} />
-                    <YAxis tickFormatter={(value) => `₹${value/1000}k`} tick={{ fill: '#6b7280' }} fontSize={12} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-gray-200 dark:stroke-gray-700"/>
+                    <XAxis dataKey="name" tick={{ fill: '#6b7280' }} fontSize={12} className="dark:fill-gray-400"/>
+                    <YAxis tickFormatter={(value) => `₹${value/1000}k`} tick={{ fill: '#6b7280' }} fontSize={12} className="dark:fill-gray-400"/>
                     <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(16, 185, 129, 0.1)' }} />
                     <Bar dataKey="spending" fill="#10B981" radius={[4, 4, 0, 0]} />
                 </BarChart>
