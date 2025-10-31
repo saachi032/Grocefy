@@ -1,0 +1,13 @@
+# Ignore all node_modules in the repo (frontend, backend, any depth)
+**/node_modules/**
+
+# Optional: common noise
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+**/.env
+
