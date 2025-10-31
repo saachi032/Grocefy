@@ -1,29 +1,44 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, ShoppingBasket } from "lucide-react"; 
+import { ShoppingCart, ShoppingBasket } from "lucide-react";
+// --- 1. Import the useAuth hook ---
 import { useAuth } from "../context/AuthContext.jsx";
 
 const LoginPage = () => {
+  // --- 2. Get the login function from context ---
   const { login } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  // --- 3. Add state for submission errors from the API ---
+  const [submitError, setSubmitError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  // --- 4. Make handleSubmit async to handle the API call ---
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError(""); // Clear previous errors
+
     if (!formData.email || !formData.password) {
-      setError("Please enter both email and password.");
+      setSubmitError("Please enter both email and password.");
       return;
     }
-    setError("");
-    
-    login(formData); 
-    navigate('/home');
+
+    try {
+      // --- 5. Call the login function from the context ---
+      await login(formData.email, formData.password);
+      
+      // --- 6. On success, navigate to the user dashboard ---
+      navigate('/home');
+
+    } catch (error) {
+      // --- 7. If the backend throws an error, display it to the user ---
+      console.error("Login failed:", error);
+      setSubmitError(error.message || "Invalid email or password.");
+    }
   };
 
   return (
@@ -63,7 +78,8 @@ const LoginPage = () => {
                 <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500" required />
               </div>
               
-              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+              {/* --- 8. Display the API submission error --- */}
+              {submitError && <p className="text-red-500 text-sm text-center">{submitError}</p>}
 
               <div>
                 <button type="submit" className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">

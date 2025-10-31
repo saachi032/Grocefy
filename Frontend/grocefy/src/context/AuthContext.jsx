@@ -1,56 +1,71 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import axios from 'axios';
 
-// Create the context
+// 1. Create the context
 const AuthContext = createContext();
 
-// Custom hook to use the auth context
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
-// Provider component
+// 2. Create the provider component
 export const AuthProvider = ({ children }) => {
-  // Initialize user from localStorage
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('grocefyUser');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // To handle initial load
 
-  // Flag to prevent redirect flicker during logout
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  // Keep localStorage in sync with user state
+  // Check for logged-in user on initial mount
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('grocefyUser', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('grocefyUser');
+    const storedUser = localStorage.getItem('userInfo');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
-  }, [user]);
+    setLoading(false);
+  }, []);
 
-  // Mock login
-  const login = (userData) => {
-    const mockUser = { name: userData.name || "Saachi", email: userData.email };
-    setUser(mockUser);
+  // Login function
+  const login = async (email, password) => {
+    try {
+      const { data } = await axios.post('/api/users/login', { email, password });
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      setUser(data);
+      return data; // Return user data on success
+    } catch (error) {
+      // Throw error to be caught by the component
+      throw error.response && error.response.data.message
+        ? new Error(error.response.data.message)
+        : error;
+    }
+  };
+  
+  // Signup function
+  const signup = async (name, email, password) => {
+     try {
+      const { data } = await axios.post('/api/users/register', { name, email, password });
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      setUser(data);
+      return data;
+    } catch (error) {
+       throw error.response && error.response.data.message
+        ? new Error(error.response.data.message)
+        : error;
+    }
   };
 
-  // Fixed logout (prevents login flicker)
+  // Logout function
   const logout = () => {
-    setIsLoggingOut(true);
+    localStorage.removeItem('userInfo');
     setUser(null);
-    // Give React time to unmount protected routes before redirecting
-    setTimeout(() => {
-      setIsLoggingOut(false);
-    }, 400);
   };
 
+  // The value provided to the context consumers
   const value = {
     user,
-    isAuthenticated: !!user,
-    isLoggingOut,
     login,
+    signup,
     logout,
+    loading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+// 3. Create a custom hook to use the context
+export const useAuth = () => {
+  return useContext(AuthContext);
 };

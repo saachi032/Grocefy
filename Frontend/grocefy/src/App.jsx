@@ -16,7 +16,7 @@ import Lists from './components/UserInterface/Lists.jsx';
 import Expenses from './components/UserInterface/Expenses.jsx';
 import Family from './components/UserInterface/Family.jsx';
 import FamilyDashboard from './components/UserInterface/FamilyDashboard.jsx';
-import MyProfile from './components/UserInterface/MyProfile.jsx'; // 1. IMPORT MyProfile HERE
+import MyProfile from './components/UserInterface/MyProfile.jsx';
 
 // Form Page Components
 import CreateList from './components/forms/CreateList.jsx';
@@ -43,7 +43,6 @@ function App() {
           <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
           <Route path="/family" element={<ProtectedRoute><Family /></ProtectedRoute>} />
           <Route path="/family/:familyId" element={<ProtectedRoute><FamilyDashboard /></ProtectedRoute>} />
-          {/* 2. ADD THE NEW ROUTE FOR THE PROFILE PAGE */}
           <Route path="/profile" element={<ProtectedRoute><MyProfile /></ProtectedRoute>} />
 
           {/* Protected Routes - Forms */}

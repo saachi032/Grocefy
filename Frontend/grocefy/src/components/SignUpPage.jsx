@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-// Import useNavigate to handle redirection
 import { Link, useNavigate } from "react-router-dom"; 
-import { ShoppingBasket, ShoppingCart } from "lucide-react"; 
+import { ShoppingBasket } from "lucide-react"; 
+// --- 1. Import the useAuth hook ---
+import { useAuth } from "../context/AuthContext.jsx";
 
 const SignUpPage = () => {
-  // Initialize the navigate function
   const navigate = useNavigate(); 
+  // --- 2. Get the signup function from the context ---
+  const { signup } = useAuth();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -17,6 +19,8 @@ const SignUpPage = () => {
   });
 
   const [errors, setErrors] = useState({});
+  // --- 3. Add state for submission errors (e.g., from the API) ---
+  const [submitError, setSubmitError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -50,18 +54,26 @@ const SignUpPage = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  // --- 4. Make handleSubmit async to await the API call ---
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError(null); // Clear previous submission errors
     const validationErrors = validateForm();
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
-      console.log("Sign up successful with data:", formData);
-      alert("Account created successfully!");
-      
-      // --- REDIRECT LOGIC ---
-      // On successful submission, navigate to the home page ('/')
-      navigate("/"); 
+      try {
+        // --- 5. Call the signup function from context ---
+        await signup(formData.name, formData.email, formData.password);
+        
+        // --- 6. On success, navigate to the authenticated user dashboard ---
+        navigate("/home"); 
+
+      } catch (error) {
+        // --- 7. If the backend throws an error, display it ---
+        console.error("Sign up failed:", error);
+        setSubmitError(error.message || "Failed to create account. Please try again.");
+      }
     } else {
       console.log("Validation failed:", validationErrors);
     }
@@ -74,9 +86,7 @@ const SignUpPage = () => {
         <div className="w-full md:w-1/2 flex flex-col justify-center bg-white p-10">
           <div className="w-full max-w-md mx-auto">
             <div className="mb-6 flex justify-center">
-                
-                <Link to="/" className="flex items-center gap-2">
-                {/* --- LOGO UPDATED --- */}
+              <Link to="/" className="flex items-center gap-2">
                 <ShoppingBasket className="w-10 h-10 text-green-500" />
                 <span className="text-3xl font-bold text-gray-800">Grocefy</span>
               </Link>
@@ -129,6 +139,9 @@ const SignUpPage = () => {
                 {errors.agree && <p className="text-red-500 text-xs mt-1">{errors.agree}</p>}
               </div>
               
+              {/* --- 8. Display the API submission error --- */}
+              {submitError && <p className="text-red-500 text-sm text-center">{submitError}</p>}
+              
               <div className="pt-1">
                 <button type="submit" className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
                   Sign Up
@@ -150,7 +163,8 @@ const SignUpPage = () => {
         </div>
         
         <div className="hidden md:flex w-1/2 bg-gray-900 text-white flex-col justify-center items-center p-12 relative overflow-hidden">
-          <ShoppingCart strokeWidth={0.5} className="absolute -right-20 -bottom-20 w-80 h-80 text-white/5" />
+          {/* Using ShoppingCart as a fallback since it's imported */}
+          <ShoppingBasket strokeWidth={0.5} className="absolute -right-20 -bottom-20 w-80 h-80 text-white/5" />
           <div className="max-w-md w-full z-10">
             <h2 className="text-4xl font-bold leading-tight">Simplify your <br /> groceries & expenses.</h2>
             <p className="mt-4 text-gray-300">Join Grocefy and stay on top of grocery lists, track expenses, and manage household needs — all in one app.</p>
