@@ -4,6 +4,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // Auth Context
 import { AuthProvider } from './context/AuthContext.jsx';
 
+// Theme Context
+import { ThemeProvider } from './context/ThemeContext.jsx';
+
 // Route Protection
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
@@ -29,9 +32,10 @@ import './App.css';
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>      
-        <Routes>
+    <ThemeProvider>
+      <Router>
+        <AuthProvider>      
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/signup" element={<SignUpPage />} />
@@ -50,9 +54,10 @@ function App() {
           <Route path="/expenses/add" element={<ProtectedRoute><AddExpense /></ProtectedRoute>} />
           <Route path="/family/create" element={<ProtectedRoute><CreateFamily /></ProtectedRoute>} />
           <Route path="/family/invite" element={<ProtectedRoute><InviteFamily/></ProtectedRoute>} />
-        </Routes>      
-    </AuthProvider>
-    </Router>
+          </Routes>      
+        </AuthProvider>
+      </Router>
+    </ThemeProvider>
   );
 }
 
