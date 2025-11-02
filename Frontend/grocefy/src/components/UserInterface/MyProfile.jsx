@@ -1,138 +1,295 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import UserNavbar from './UserNavbar.jsx';
 import { useTheme } from '../../context/ThemeContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import {
     User, Mail, Calendar, Phone, Edit3, Save, X, Settings, Moon, Sun, Bell, BellOff,
     Users as FamilyIcon, ArrowRight, LogOut, Trash2, Wallet, ClipboardList, CheckSquare, BarChart3, Crown
 } from 'lucide-react';
 
-// --- MOCK USER DATA ---
-const mockUserData = {
-    name: 'Aarav Sharma',
-    email: 'aarav.sharma@example.com',
-    avatar: '🧑',
-    role: 'Admin',
-    joinedDate: '2025-01-15',
-    contactNumber: '+91 98765 43210',
-    preferences: {
-        currency: '₹',
-        theme: 'Light',
-        notifications: true,
-    },
-    family: {
-        id: 1,
-        name: 'The Sharma Household',
-    },
-    activity: {
-        totalExpenses: 12450.75,
-        listsCreated: 8,
-        itemsChecked: 112,
-        familyContribution: '₹2,400',
-    },
-};
+// Avatar options with dogs and cats
+const AVATAR_OPTIONS = [
+    { emoji: '🐕', name: 'Dog' },
+    { emoji: '🐶', name: 'Puppy' },
+    { emoji: '🐩', name: 'Poodle' },
+    { emoji: '🐺', name: 'Wolf' },
+    { emoji: '🐱', name: 'Cat' },
+    { emoji: '🐈', name: 'Cat Face' },
+    { emoji: '🐈‍⬛', name: 'Black Cat' },
+    { emoji: '🐅', name: 'Tiger' },
+    { emoji: '🦁', name: 'Lion' },
+    { emoji: '🧑', name: 'Person' },
+    { emoji: '👤', name: 'User' },
+    { emoji: '😎', name: 'Cool' },
+];
 
 // --- HELPER COMPONENTS ---
 
 // Stat Card for Activity Summary
-const StatCard = ({ icon, title, value, colorClass }) => (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center gap-4 transition-all hover:shadow-md hover:-translate-y-1">
+const StatCard = ({ icon, title, value, colorClass, isDark }) => (
+    <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 rounded-xl border flex items-center gap-4 transition-all hover:shadow-md hover:-translate-y-1`}>
         <div className={`p-3 rounded-lg ${colorClass}`}>
             {icon}
         </div>
         <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
-            <p className="text-lg font-bold text-gray-800 dark:text-gray-100">{value}</p>
+            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{title}</p>
+            <p className={`text-lg font-bold ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>{value}</p>
         </div>
     </div>
 );
 
 // Toggle Switch for Preferences
-const ToggleSwitch = ({ enabled, setEnabled, labelOn, labelOff, IconOn, IconOff }) => (
+const ToggleSwitch = ({ enabled, setEnabled, labelOn, labelOff, IconOn, IconOff, isDark }) => (
     <div className="flex items-center justify-between py-2">
         <div className="flex items-center gap-2">
-            {enabled ? <IconOn size={18} className="text-gray-600 dark:text-gray-300"/> : <IconOff size={18} className="text-gray-600 dark:text-gray-300"/>}
-            <span className="font-semibold text-gray-700 dark:text-gray-200">{enabled ? labelOn : labelOff}</span>
+            {enabled ? <IconOn size={18} className={isDark ? 'text-gray-300' : 'text-gray-600'}/> : <IconOff size={18} className={isDark ? 'text-gray-300' : 'text-gray-600'}/>}
+            <span className={`font-semibold ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>{enabled ? labelOn : labelOff}</span>
         </div>
         <button
             onClick={() => setEnabled(!enabled)}
-            className={`relative inline-flex items-center h-7 w-12 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 ${enabled ? 'bg-green-600 dark:bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+            className={`relative inline-flex items-center h-7 w-12 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${enabled ? 'bg-green-600' : isDark ? 'bg-gray-600' : 'bg-gray-300'}`}
         >
             <span className={`inline-block w-5 h-5 transform bg-white rounded-full transition-transform duration-300 ${enabled ? 'translate-x-6' : 'translate-x-1'}`}/>
         </button>
     </div>
 );
 
+// Avatar Selection Modal
+const AvatarModal = ({ isOpen, onClose, onSelect, currentAvatar, isDark }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+            <div 
+                className={`${isDark ? 'bg-gray-800' : 'bg-white'} w-full max-w-md rounded-2xl shadow-2xl p-6`}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>Select Avatar</h3>
+                    <button onClick={onClose} className={`${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`}>
+                        <X size={24} />
+                    </button>
+                </div>
+                <div className="grid grid-cols-4 gap-4">
+                    {AVATAR_OPTIONS.map((avatar) => (
+                        <button
+                            key={avatar.emoji}
+                            onClick={() => onSelect(avatar.emoji)}
+                            className={`p-4 text-4xl rounded-xl transition-all ${
+                                currentAvatar === avatar.emoji
+                                    ? 'bg-green-600 ring-2 ring-green-400'
+                                    : isDark 
+                                        ? 'bg-gray-700 hover:bg-gray-600' 
+                                        : 'bg-gray-100 hover:bg-gray-200'
+                            }`}
+                        >
+                            {avatar.emoji}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 // --- MAIN PROFILE COMPONENT ---
 const MyProfile = () => {
     const navigate = useNavigate();
     const { isDarkMode, toggleTheme } = useTheme();
-    const [user, setUser] = useState(mockUserData);
+    const { user, logout } = useAuth();
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
+    const [showAvatarModal, setShowAvatarModal] = useState(false);
+    const [saving, setSaving] = useState(false);
     
     // Preferences State
-    const [notifications, setNotifications] = useState(user.preferences.notifications);
+    const [notifications, setNotifications] = useState(true);
     
     // Editable Form Fields State
-    const [editableName, setEditableName] = useState(user.name);
-    const [editableContact, setEditableContact] = useState(user.contactNumber);
+    const [editableName, setEditableName] = useState('');
+    const [editableContact, setEditableContact] = useState('');
+    const [editableAvatar, setEditableAvatar] = useState('🧑');
 
-    const handleSave = () => {
-        // In a real app, you'd make an API call here.
-        setUser(prev => ({ ...prev, name: editableName, contactNumber: editableContact }));
-        setIsEditing(false);
+    // Fetch user profile from backend
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (!user?.token) {
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch profile');
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    setUserData(data.user);
+                    setEditableName(data.user.name || '');
+                    setEditableContact(data.user.phone || '');
+                    setEditableAvatar(data.user.avatar || '🧑');
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, [user]);
+
+    const handleSave = async () => {
+        if (!user?.token) return;
+
+        setSaving(true);
+        try {
+            const response = await fetch('/api/users/profile', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: editableName,
+                    phone: editableContact,
+                    avatar: editableAvatar,
+                }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                setUserData(data.user);
+                setIsEditing(false);
+                setShowAvatarModal(false);
+            } else {
+                alert(data.message || 'Failed to update profile');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            alert('Error updating profile');
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleCancel = () => {
-        setEditableName(user.name);
-        setEditableContact(user.contactNumber);
+        if (userData) {
+            setEditableName(userData.name || '');
+            setEditableContact(userData.phone || '');
+            setEditableAvatar(userData.avatar || '🧑');
+        }
         setIsEditing(false);
+    };
+
+    const handleAvatarSelect = (avatar) => {
+        setEditableAvatar(avatar);
+        setShowAvatarModal(false);
     };
 
     const handleLogout = () => {
         if (window.confirm("Are you sure you want to log out?")) {
-            navigate('/'); // Redirect to login page
+            logout();
+            navigate('/');
         }
     };
+
+    if (loading) {
+        return (
+            <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} min-h-screen font-sans transition-colors duration-300`}>
+                <UserNavbar />
+                <main className="w-full max-w-5xl mx-auto px-4 py-12 flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Loading profile...</p>
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    if (!userData) {
+        return (
+            <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} min-h-screen font-sans transition-colors duration-300`}>
+                <UserNavbar />
+                <main className="w-full max-w-5xl mx-auto px-4 py-12">
+                    <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Failed to load profile</p>
+                </main>
+            </div>
+        );
+    }
+
+    const joinedDate = userData.createdAt ? new Date(userData.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A';
     
     return (
-        <div className="bg-gray-100 dark:bg-gray-900 min-h-screen font-sans transition-colors duration-300">
+        <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} min-h-screen font-sans transition-colors duration-300`}>
             <UserNavbar />
             <main className="w-full max-w-5xl mx-auto px-4 py-12">
                 {/* Header */}
                 <header className="mb-10">
-                    <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100">My Profile</h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your account, preferences, and family connections.</p>
+                    <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>My Profile</h1>
+                    <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>Manage your account, preferences, and family connections.</p>
                 </header>
 
                 {/* Profile Card and Welcome Message */}
                 <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-                    <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm text-center flex flex-col items-center justify-center transition-colors duration-300">
+                    <div className={`lg:col-span-1 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-2xl border shadow-sm text-center flex flex-col items-center justify-center transition-colors duration-300`}>
                         <div className="relative mb-4">
-                            <div className="w-28 h-28 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-5xl">{user.avatar}</div>
-                            <button className="absolute bottom-0 right-0 p-2 bg-green-600 dark:bg-green-500 text-white rounded-full hover:bg-green-500 dark:hover:bg-green-400 transition-transform transform hover:scale-110">
+                            <div className={`w-28 h-28 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-full flex items-center justify-center text-5xl`}>{editableAvatar}</div>
+                            <button 
+                                onClick={() => setShowAvatarModal(true)} 
+                                className="absolute bottom-0 right-0 p-2 bg-green-600 text-white rounded-full hover:bg-green-500 transition-transform transform hover:scale-110"
+                            >
                                 <Edit3 size={16} />
                             </button>
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{user.name}</h2>
-                        <p className="text-gray-500 dark:text-gray-400">{user.email}</p>
-                        {user.role === 'Admin' && (
-                            <div className="mt-2 flex items-center gap-1.5 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs font-semibold rounded-full">
-                                <Crown size={14}/> Family Admin
-                            </div>
-                        )}
+                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>{editableName}</h2>
+                        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>{userData.email}</p>
                     </div>
                     <div className="lg:col-span-2 space-y-4">
-                         <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-400 text-green-800 dark:text-green-200 p-5 rounded-r-lg transition-colors duration-300">
-                            <h3 className="font-bold text-lg">Hey {user.name.split(' ')[0]} 👋,</h3>
-                            <p>You've helped your family save an estimated <span className="font-bold">{user.activity.familyContribution}</span> this month!</p>
+                         <div className={`${isDarkMode ? 'bg-green-900/20 border-green-700 text-green-200' : 'bg-green-50 border-green-500 text-green-800'} border-l-4 p-5 rounded-r-lg transition-colors duration-300`}>
+                            <h3 className="font-bold text-lg">Hey {editableName.split(' ')[0]} 👋,</h3>
+                            <p>Welcome to your profile! Manage your settings and preferences here.</p>
                         </div>
                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <StatCard icon={<Wallet size={20} className="text-green-600 dark:text-green-400"/>} title="Total Expenses Added" value={`₹${user.activity.totalExpenses.toLocaleString('en-IN')}`} colorClass="bg-green-100 dark:bg-green-900/30" />
-                            <StatCard icon={<ClipboardList size={20} className="text-blue-600 dark:text-blue-400"/>} title="Lists Created" value={user.activity.listsCreated} colorClass="bg-blue-100 dark:bg-blue-900/30" />
-                            <StatCard icon={<CheckSquare size={20} className="text-purple-600 dark:text-purple-400"/>} title="Items Checked Off" value={user.activity.itemsChecked} colorClass="bg-purple-100 dark:bg-purple-900/30" />
-                            <StatCard icon={<BarChart3 size={20} className="text-yellow-600 dark:text-yellow-400"/>} title="Family Contributions" value={user.activity.familyContribution} colorClass="bg-yellow-100 dark:bg-yellow-900/30" />
+                            <StatCard 
+                                icon={<Wallet size={20} className="text-green-600 dark:text-green-400"/>} 
+                                title="Total Expenses" 
+                                value="₹0" 
+                                colorClass={isDarkMode ? 'bg-green-900/30' : 'bg-green-100'}
+                                isDark={isDarkMode}
+                            />
+                            <StatCard 
+                                icon={<ClipboardList size={20} className="text-blue-600 dark:text-blue-400"/>} 
+                                title="Lists Created" 
+                                value="0" 
+                                colorClass={isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'}
+                                isDark={isDarkMode}
+                            />
+                            <StatCard 
+                                icon={<CheckSquare size={20} className="text-purple-600 dark:text-purple-400"/>} 
+                                title="Items Checked" 
+                                value="0" 
+                                colorClass={isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'}
+                                isDark={isDarkMode}
+                            />
+                            <StatCard 
+                                icon={<BarChart3 size={20} className="text-yellow-600 dark:text-yellow-400"/>} 
+                                title="Family Members" 
+                                value="0" 
+                                colorClass={isDarkMode ? 'bg-yellow-900/30' : 'bg-yellow-100'}
+                                isDark={isDarkMode}
+                            />
                         </div>
                     </div>
                 </section>
@@ -141,62 +298,116 @@ const MyProfile = () => {
                 <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="space-y-8">
                         {/* Personal Info */}
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
+                        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-2xl border shadow-sm transition-colors duration-300`}>
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Personal Info</h3>
+                                <h3 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Personal Info</h3>
                                 {isEditing ? (
                                     <div className="flex gap-2">
-                                        <button onClick={handleSave} className="p-2 text-green-600 hover:bg-green-100 rounded-full"><Save size={18}/></button>
-                                        <button onClick={handleCancel} className="p-2 text-gray-500 hover:bg-gray-100 rounded-full"><X size={18}/></button>
+                                        <button onClick={handleSave} disabled={saving} className={`p-2 ${isDarkMode ? 'text-green-400 hover:bg-gray-700' : 'text-green-600 hover:bg-green-100'} rounded-full transition-colors disabled:opacity-50`}>
+                                            <Save size={18}/>
+                                        </button>
+                                        <button onClick={handleCancel} className={`p-2 ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'} rounded-full transition-colors`}>
+                                            <X size={18}/>
+                                        </button>
                                     </div>
                                 ) : (
-                                    <button onClick={() => setIsEditing(true)} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"><Edit3 size={18}/></button>
+                                    <button onClick={() => setIsEditing(true)} className={`p-2 ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'} rounded-full transition-colors`}>
+                                        <Edit3 size={18}/>
+                                    </button>
                                 )}
                             </div>
-                            <div className="space-y-4 text-gray-700 dark:text-gray-300">
-                                <div className="flex items-center gap-3"><User size={18} className="text-gray-400 dark:text-gray-500"/> {isEditing ? <input value={editableName} onChange={(e) => setEditableName(e.target.value)} className="w-full p-1 border-b dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"/> : <span>{user.name}</span>}</div>
-                                <div className="flex items-center gap-3"><Mail size={18} className="text-gray-400 dark:text-gray-500"/> <span>{user.email}</span></div>
-                                <div className="flex items-center gap-3"><Phone size={18} className="text-gray-400 dark:text-gray-500"/> {isEditing ? <input value={editableContact} onChange={(e) => setEditableContact(e.target.value)} className="w-full p-1 border-b dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"/> : <span>{user.contactNumber}</span>}</div>
-                                <div className="flex items-center gap-3"><Calendar size={18} className="text-gray-400 dark:text-gray-500"/> <span>Joined on {new Date(user.joinedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span></div>
-                            </div>
-                        </div>
-
-                        {/* Family Connections */}
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
-                             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Family Connections</h3>
-                             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg flex items-center justify-between">
-                                <div>
-                                    <p className="font-bold dark:text-gray-100">{user.family.name}</p>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Your role: {user.role}</p>
+                            <div className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <div className="flex items-center gap-3">
+                                    <User size={18} className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}/> 
+                                    {isEditing ? (
+                                        <input 
+                                            value={editableName} 
+                                            onChange={(e) => setEditableName(e.target.value)} 
+                                            className={`flex-1 p-1 border-b ${isDarkMode ? 'bg-gray-700 text-gray-100 border-gray-600' : 'bg-white border-gray-300'}`}
+                                        />
+                                    ) : (
+                                        <span>{editableName}</span>
+                                    )}
                                 </div>
-                                <Link to={`/family/${user.family.id}`} className="flex items-center gap-1.5 font-semibold text-green-600 dark:text-green-400 hover:text-green-500 dark:hover:text-green-300">View <ArrowRight size={16}/></Link>
-                             </div>
-                             <button className="mt-4 w-full text-center text-sm text-red-600 dark:text-red-400 font-semibold hover:underline">Leave Family</button>
+                                <div className="flex items-center gap-3">
+                                    <Mail size={18} className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}/> 
+                                    <span>{userData.email}</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <Phone size={18} className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}/> 
+                                    {isEditing ? (
+                                        <input 
+                                            value={editableContact} 
+                                            onChange={(e) => setEditableContact(e.target.value)} 
+                                            className={`flex-1 p-1 border-b ${isDarkMode ? 'bg-gray-700 text-gray-100 border-gray-600' : 'bg-white border-gray-300'}`}
+                                        />
+                                    ) : (
+                                        <span>{editableContact || 'Not set'}</span>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <Calendar size={18} className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}/> 
+                                    <span>Joined on {joinedDate}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <div className="space-y-8">
                         {/* Preferences */}
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
-                             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Preferences</h3>
-                             <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                                <ToggleSwitch enabled={isDarkMode} setEnabled={toggleTheme} labelOn="Dark Mode" labelOff="Light Mode" IconOn={Moon} IconOff={Sun} />
-                                <ToggleSwitch enabled={notifications} setEnabled={setNotifications} labelOn="Notifications On" labelOff="Notifications Off" IconOn={Bell} IconOff={BellOff} />
+                        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-2xl border shadow-sm transition-colors duration-300`}>
+                             <h3 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'} mb-2`}>Preferences</h3>
+                             <div className={`divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-100'}`}>
+                                <ToggleSwitch 
+                                    enabled={isDarkMode} 
+                                    setEnabled={toggleTheme} 
+                                    labelOn="Dark Mode" 
+                                    labelOff="Light Mode" 
+                                    IconOn={Moon} 
+                                    IconOff={Sun}
+                                    isDark={isDarkMode}
+                                />
+                                <ToggleSwitch 
+                                    enabled={notifications} 
+                                    setEnabled={setNotifications} 
+                                    labelOn="Notifications On" 
+                                    labelOff="Notifications Off" 
+                                    IconOn={Bell} 
+                                    IconOff={BellOff}
+                                    isDark={isDarkMode}
+                                />
                              </div>
                         </div>
 
                         {/* Security Actions */}
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm transition-colors duration-300">
-                            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Account Actions</h3>
+                        <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-2xl border shadow-sm transition-colors duration-300`}>
+                            <h3 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'} mb-4`}>Account Actions</h3>
                             <div className="space-y-3">
-                                <button className="w-full text-left p-3 font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors">Change Password</button>
-                                <button onClick={handleLogout} className="w-full text-left p-3 font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors flex items-center gap-2"><LogOut size={16}/> Logout</button>
-                                <button className="w-full text-left p-3 font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors flex items-center gap-2"><Trash2 size={16}/> Delete Account</button>
+                                <button className={`w-full text-left p-3 font-semibold ${isDarkMode ? 'text-gray-200 bg-gray-700 hover:bg-gray-600' : 'text-gray-700 bg-gray-100 hover:bg-gray-200'} rounded-lg transition-colors`}>
+                                    Change Password
+                                </button>
+                                <button 
+                                    onClick={handleLogout} 
+                                    className={`w-full text-left p-3 font-semibold ${isDarkMode ? 'text-gray-200 bg-gray-700 hover:bg-gray-600' : 'text-gray-700 bg-gray-100 hover:bg-gray-200'} rounded-lg transition-colors flex items-center gap-2`}
+                                >
+                                    <LogOut size={16}/> Logout
+                                </button>
+                                <button className={`w-full text-left p-3 font-semibold ${isDarkMode ? 'text-red-400 bg-red-900/20 hover:bg-red-900/30' : 'text-red-600 bg-red-50 hover:bg-red-100'} rounded-lg transition-colors flex items-center gap-2`}>
+                                    <Trash2 size={16}/> Delete Account
+                                </button>
                             </div>
                         </div>
                     </div>
                 </section>
             </main>
+
+            <AvatarModal
+                isOpen={showAvatarModal}
+                onClose={() => setShowAvatarModal(false)}
+                onSelect={handleAvatarSelect}
+                currentAvatar={editableAvatar}
+                isDark={isDarkMode}
+            />
         </div>
     );
 };

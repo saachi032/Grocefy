@@ -8,7 +8,7 @@ import { useTheme } from '../../context/ThemeContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 import UserNavbar from './UserNavbar.jsx';
-import { Plus, ChevronLeft, ChevronRight, Calendar, CreditCard, Wallet, Landmark, Trash2 } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Calendar, CreditCard, Wallet, Landmark, Trash2, Target, Settings, X, Save, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 
 const PaymentInfo = ({ method }) => {
     let Icon;
@@ -37,51 +37,440 @@ const CustomTooltip = ({ active, payload }) => {
     return null;
 };
 
+// Budget Setup Modal Component
+const BudgetSetupModal = ({ isOpen, onClose, onSave, budget, isDark, saving }) => {
+  const [activeTab, setActiveTab] = useState('weekly');
+  const [weeklyBudget, setWeeklyBudget] = useState(budget?.weeklyBudget || 0);
+  const [monthlyBudget, setMonthlyBudget] = useState(budget?.monthlyBudget || 0);
+
+  useEffect(() => {
+    if (budget) {
+      setWeeklyBudget(budget.weeklyBudget || 0);
+      setMonthlyBudget(budget.monthlyBudget || 0);
+    }
+  }, [budget, isOpen]);
+
+  if (!isOpen) return null;
+
+  const handleSave = () => {
+    onSave({
+      weeklyBudget: parseFloat(weeklyBudget) || 0,
+      monthlyBudget: parseFloat(monthlyBudget) || 0,
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div 
+        className={`${isDark ? 'bg-gray-800' : 'bg-white'} w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className={`${isDark ? 'bg-gradient-to-r from-green-600 to-green-700' : 'bg-gradient-to-r from-green-500 to-green-600'} p-6 text-white`}>
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <Target size={24} />
+                Set Up Budget
+              </h2>
+              <p className="text-green-100 mt-1">Track your spending with weekly or monthly limits</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className={`flex border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+          <button
+            onClick={() => setActiveTab('weekly')}
+            className={`flex-1 px-6 py-4 font-semibold transition-colors ${
+              activeTab === 'weekly'
+                ? `${isDark ? 'text-green-400 border-b-2 border-green-400' : 'text-green-600 border-b-2 border-green-600'}`
+                : `${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`
+            }`}
+          >
+            Weekly Budget
+          </button>
+          <button
+            onClick={() => setActiveTab('monthly')}
+            className={`flex-1 px-6 py-4 font-semibold transition-colors ${
+              activeTab === 'monthly'
+                ? `${isDark ? 'text-green-400 border-b-2 border-green-400' : 'text-green-600 border-b-2 border-green-600'}`
+                : `${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`
+            }`}
+          >
+            Monthly Budget
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          {activeTab === 'weekly' ? (
+            <div className="space-y-6">
+              <div>
+                <label className={`block text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                  Weekly Budget Amount
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-400">₹</span>
+                  <input
+                    type="number"
+                    value={weeklyBudget}
+                    onChange={(e) => setWeeklyBudget(e.target.value)}
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                    className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 focus:ring-2 focus:ring-green-500 outline-none transition-all ${
+                      isDark 
+                        ? 'bg-gray-700 border-gray-600 text-white focus:border-green-500' 
+                        : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
+                    }`}
+                  />
+                </div>
+                <p className={`text-xs mt-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Set your maximum spending limit for each week
+                </p>
+              </div>
+
+              {weeklyBudget > 0 && (
+                <div className={`${isDark ? 'bg-green-900/20 border-green-700' : 'bg-green-50 border-green-200'} border rounded-xl p-4`}>
+                  <div className="flex items-center gap-2 text-green-700 dark:text-green-300 mb-2">
+                    <Target size={18} />
+                    <span className="font-semibold">Budget Preview</span>
+                  </div>
+                  <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Your weekly budget is set to <span className="font-bold text-green-600 dark:text-green-400">₹{parseFloat(weeklyBudget || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div>
+                <label className={`block text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                  Monthly Budget Amount
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-400">₹</span>
+                  <input
+                    type="number"
+                    value={monthlyBudget}
+                    onChange={(e) => setMonthlyBudget(e.target.value)}
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                    className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 focus:ring-2 focus:ring-green-500 outline-none transition-all ${
+                      isDark 
+                        ? 'bg-gray-700 border-gray-600 text-white focus:border-green-500' 
+                        : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
+                    }`}
+                  />
+                </div>
+                <p className={`text-xs mt-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Set your maximum spending limit for each month
+                </p>
+              </div>
+
+              {monthlyBudget > 0 && (
+                <div className={`${isDark ? 'bg-green-900/20 border-green-700' : 'bg-green-50 border-green-200'} border rounded-xl p-4`}>
+                  <div className="flex items-center gap-2 text-green-700 dark:text-green-300 mb-2">
+                    <Target size={18} />
+                    <span className="font-semibold">Budget Preview</span>
+                  </div>
+                  <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Your monthly budget is set to <span className="font-bold text-green-600 dark:text-green-400">₹{parseFloat(monthlyBudget || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <button
+              onClick={onClose}
+              className={`flex-1 px-6 py-3 ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'} font-semibold rounded-xl transition-colors`}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-xl hover:from-green-500 hover:to-green-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {saving ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={20} />
+                  Save Budget
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Budget Status Card Component
+const BudgetStatusCard = ({ budget, spending, period, isDark, onSetup }) => {
+  const budgetAmount = period === 'weekly' ? budget?.weeklyBudget : budget?.monthlyBudget;
+  const remaining = budgetAmount > 0 ? budgetAmount - spending : 0;
+  const percentage = budgetAmount > 0 ? (spending / budgetAmount) * 100 : 0;
+  const isOverBudget = spending > budgetAmount;
+  const statusColor = isOverBudget 
+    ? 'red' 
+    : percentage >= 90 
+      ? 'orange' 
+      : percentage >= 75 
+        ? 'yellow' 
+        : 'green';
+
+  if (!budgetAmount || budgetAmount === 0) {
+    return (
+      <div className={`${isDark ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700' : 'bg-gradient-to-br from-white to-gray-50 border-gray-200'} border rounded-2xl p-6 shadow-lg transition-all hover:shadow-xl`}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className={`p-3 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-xl`}>
+              <Target size={24} className="text-gray-500" />
+            </div>
+            <div>
+              <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                {period === 'weekly' ? 'Weekly' : 'Monthly'} Budget
+              </h3>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Not set up yet</p>
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={onSetup}
+          className="w-full mt-4 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-xl hover:from-green-500 hover:to-green-600 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+        >
+          <Settings size={20} />
+          Set Up Budget
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`${isDark ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700' : 'bg-gradient-to-br from-white to-gray-50 border-gray-200'} border rounded-2xl p-6 shadow-lg transition-all hover:shadow-xl`}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className={`p-3 ${
+            statusColor === 'green' ? 'bg-green-100 dark:bg-green-900/30' :
+            statusColor === 'yellow' ? 'bg-yellow-100 dark:bg-yellow-900/30' :
+            statusColor === 'orange' ? 'bg-orange-100 dark:bg-orange-900/30' :
+            'bg-red-100 dark:bg-red-900/30'
+          } rounded-xl`}>
+            <Target size={24} className={
+              statusColor === 'green' ? 'text-green-600 dark:text-green-400' :
+              statusColor === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
+              statusColor === 'orange' ? 'text-orange-600 dark:text-orange-400' :
+              'text-red-600 dark:text-red-400'
+            } />
+          </div>
+          <div>
+            <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
+              {period === 'weekly' ? 'Weekly' : 'Monthly'} Budget
+            </h3>
+            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+              {isOverBudget ? 'Over budget' : `${remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 })} remaining`}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={onSetup}
+          className={`p-2 ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} rounded-lg transition-colors`}
+          title="Edit budget"
+        >
+          <Settings size={18} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
+        </button>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <span className={`text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+            Spent: ₹{spending.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </span>
+          <span className={`text-sm font-bold ${
+            statusColor === 'green' ? 'text-green-600 dark:text-green-400' :
+            statusColor === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
+            statusColor === 'orange' ? 'text-orange-600 dark:text-orange-400' :
+            'text-red-600 dark:text-red-400'
+          }`}>
+            {percentage.toFixed(1)}%
+          </span>
+        </div>
+        <div className={`w-full ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-full h-4 overflow-hidden shadow-inner`}>
+          <div 
+            className={`h-4 rounded-full transition-all duration-500 ${
+              statusColor === 'green' ? 'bg-gradient-to-r from-green-500 to-green-600' :
+              statusColor === 'yellow' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600' :
+              statusColor === 'orange' ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
+              'bg-gradient-to-r from-red-500 to-red-600'
+            } shadow-lg`}
+            style={{ width: `${Math.min(percentage, 100)}%` }}
+          >
+            {percentage > 100 && (
+              <div className="w-full h-full bg-red-600 animate-pulse"></div>
+            )}
+          </div>
+        </div>
+        <div className="flex justify-between items-center mt-2">
+          <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+            Budget: ₹{budgetAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </span>
+          {isOverBudget && (
+            <span className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center gap-1">
+              <AlertCircle size={14} />
+              Over by ₹{Math.abs(remaining).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Status Message */}
+      <div className={`${
+        statusColor === 'green' ? `${isDark ? 'bg-green-900/20 border-green-700' : 'bg-green-50 border-green-200'}` :
+        statusColor === 'yellow' ? `${isDark ? 'bg-yellow-900/20 border-yellow-700' : 'bg-yellow-50 border-yellow-200'}` :
+        statusColor === 'orange' ? `${isDark ? 'bg-orange-900/20 border-orange-700' : 'bg-orange-50 border-orange-200'}` :
+        `${isDark ? 'bg-red-900/20 border-red-700' : 'bg-red-50 border-red-200'}`
+      } border rounded-lg p-3 flex items-start gap-2`}>
+        {isOverBudget ? (
+          <>
+            <TrendingUp size={18} className="text-red-600 dark:text-red-400 mt-0.5" />
+            <div>
+              <p className={`text-sm font-semibold ${
+                statusColor === 'red' ? 'text-red-700 dark:text-red-300' : ''
+              }`}>
+                Budget Exceeded!
+              </p>
+              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+                You've exceeded your budget. Consider reviewing your expenses.
+              </p>
+            </div>
+          </>
+        ) : percentage >= 90 ? (
+          <>
+            <AlertCircle size={18} className="text-orange-600 dark:text-orange-400 mt-0.5" />
+            <div>
+              <p className={`text-sm font-semibold ${
+                statusColor === 'orange' ? 'text-orange-700 dark:text-orange-300' : ''
+              }`}>
+                Almost There!
+              </p>
+              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+                You're close to your budget limit. Spend wisely!
+              </p>
+            </div>
+          </>
+        ) : percentage >= 75 ? (
+          <>
+            <TrendingUp size={18} className="text-yellow-600 dark:text-yellow-400 mt-0.5" />
+            <div>
+              <p className={`text-sm font-semibold ${
+                statusColor === 'yellow' ? 'text-yellow-700 dark:text-yellow-300' : ''
+              }`}>
+                On Track
+              </p>
+              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+                You're doing well! Keep monitoring your spending.
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <TrendingDown size={18} className="text-green-600 dark:text-green-400 mt-0.5" />
+            <div>
+              <p className={`text-sm font-semibold ${
+                statusColor === 'green' ? 'text-green-700 dark:text-green-300' : ''
+              }`}>
+                Great Job!
+              </p>
+              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+                You're well within your budget. Keep it up!
+              </p>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const Expenses = () => {
   const { isDarkMode } = useTheme();
   const { user } = useAuth();
   const [expenses, setExpenses] = useState([]);
+  const [budget, setBudget] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [budgetLoading, setBudgetLoading] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isPickerOpen, setPickerOpen] = useState(false);
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [savingBudget, setSavingBudget] = useState(false);
 
-  // Fetch expenses from backend
+  // Fetch expenses and budget from backend
   useEffect(() => {
-    const fetchExpenses = async () => {
+    const fetchData = async () => {
       if (!user?.token) {
         setLoading(false);
         return;
       }
 
       try {
-        const response = await fetch('/api/expenses', {
-          headers: {
-            'Authorization': `Bearer ${user.token}`,
-            'Content-Type': 'application/json',
-          },
-        });
+        const [expensesRes, budgetRes] = await Promise.all([
+          fetch('/api/expenses', {
+            headers: {
+              'Authorization': `Bearer ${user.token}`,
+              'Content-Type': 'application/json',
+            },
+          }),
+          fetch('/api/budgets', {
+            headers: {
+              'Authorization': `Bearer ${user.token}`,
+              'Content-Type': 'application/json',
+            },
+          }),
+        ]);
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch expenses');
+        if (expensesRes.ok) {
+          const expensesData = await expensesRes.json();
+          if (expensesData.success) {
+            const formattedExpenses = expensesData.expenses.map(exp => ({
+              ...exp,
+              date: exp.date ? new Date(exp.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+            }));
+            setExpenses(formattedExpenses);
+          }
         }
 
-        const data = await response.json();
-        if (data.success) {
-          // Convert date strings to Date objects for compatibility
-          const formattedExpenses = data.expenses.map(exp => ({
-            ...exp,
-            date: exp.date ? new Date(exp.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-          }));
-          setExpenses(formattedExpenses);
+        if (budgetRes.ok) {
+          const budgetData = await budgetRes.json();
+          if (budgetData.success) {
+            setBudget(budgetData.budget);
+          }
         }
       } catch (error) {
-        console.error('Error fetching expenses:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchExpenses();
+    fetchData();
   }, [user]);
 
   const deleteExpense = async (expenseId) => {
@@ -99,8 +488,20 @@ const Expenses = () => {
       });
 
       if (response.ok) {
-        // Remove expense from state
         setExpenses(expenses.filter(exp => exp._id !== expenseId));
+        // Refresh budget to update spending
+        const budgetRes = await fetch('/api/budgets', {
+          headers: {
+            'Authorization': `Bearer ${user.token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        if (budgetRes.ok) {
+          const budgetData = await budgetRes.json();
+          if (budgetData.success) {
+            setBudget(budgetData.budget);
+          }
+        }
       } else {
         alert('Failed to delete expense');
       }
@@ -110,7 +511,36 @@ const Expenses = () => {
     }
   };
 
-  const { weekExpenses, weeklyTotal, weekTitle, monthlyData } = useMemo(() => {
+  const handleSaveBudget = async (budgetData) => {
+    if (!user?.token) return;
+
+    setSavingBudget(true);
+    try {
+      const response = await fetch('/api/budgets', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(budgetData),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setBudget(data.budget);
+        setShowBudgetModal(false);
+      } else {
+        alert(data.message || 'Failed to save budget');
+      }
+    } catch (error) {
+      console.error('Error saving budget:', error);
+      alert('Error saving budget');
+    } finally {
+      setSavingBudget(false);
+    }
+  };
+
+  const { weekExpenses, weeklyTotal, weekTitle, monthlyData, monthlyTotal } = useMemo(() => {
     const start = startOfWeek(currentDate, { weekStartsOn: 1 });
     const end = endOfWeek(currentDate, { weekStartsOn: 1 });
     const weekExpenses = expenses
@@ -127,6 +557,7 @@ const Expenses = () => {
       const expDate = new Date(e.date);
       return expDate >= startMonth && expDate <= endMonth;
     });
+    const monthlyTotal = expensesInMonth.reduce((sum, exp) => sum + exp.amount, 0);
     const daysInMonth = eachDayOfInterval({ start: startMonth, end: endMonth });
     const monthlyData = daysInMonth.map(day => ({
       name: format(day, 'd'),
@@ -134,7 +565,7 @@ const Expenses = () => {
         .filter(exp => isSameDay(new Date(exp.date), day))
         .reduce((sum, exp) => sum + exp.amount, 0),
     }));
-    return { weekExpenses, weeklyTotal, weekTitle, monthlyData };
+    return { weekExpenses, weeklyTotal, weekTitle, monthlyData, monthlyTotal };
   }, [currentDate, expenses]);
 
   const goToPreviousWeek = () => setCurrentDate(subWeeks(currentDate, 1));
@@ -188,9 +619,27 @@ const Expenses = () => {
                 </button>
             </div>
         </header>
+
+        {/* Budget Status Cards */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <BudgetStatusCard
+            budget={budget}
+            spending={weeklyTotal}
+            period="weekly"
+            isDark={isDarkMode}
+            onSetup={() => setShowBudgetModal(true)}
+          />
+          <BudgetStatusCard
+            budget={budget}
+            spending={monthlyTotal}
+            period="monthly"
+            isDark={isDarkMode}
+            onSetup={() => setShowBudgetModal(true)}
+          />
+        </section>
         
         {/* --- REDESIGNED TABLE CONTAINER --- */}
-        <div className={`rounded-xl border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden shadow-sm transition-colors`}>
+        <div className={`rounded-xl border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden shadow-sm transition-colors mb-8`}>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px]">
               {/* --- STICKY HEADER --- */}
@@ -251,7 +700,7 @@ const Expenses = () => {
           </div>
         </div>
         
-        <section className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 md:p-6 mt-8 rounded-2xl border shadow-sm transition-colors`}>
+        <section className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 md:p-6 rounded-2xl border shadow-sm transition-colors`}>
             <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`}>
                 Monthly Overview for {format(currentDate, 'MMMM')}
             </h2>
@@ -266,6 +715,16 @@ const Expenses = () => {
             </ResponsiveContainer>
         </section>
       </main>
+
+      {/* Budget Setup Modal */}
+      <BudgetSetupModal
+        isOpen={showBudgetModal}
+        onClose={() => setShowBudgetModal(false)}
+        onSave={handleSaveBudget}
+        budget={budget}
+        isDark={isDarkMode}
+        saving={savingBudget}
+      />
     </div>
   );
 };
