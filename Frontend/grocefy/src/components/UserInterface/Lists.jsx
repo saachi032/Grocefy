@@ -128,11 +128,12 @@ const NotepadView = ({ list, onClose, onSave, isDark }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div 
-        className={`${isDark ? 'bg-gray-800' : 'bg-amber-50'} w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden`}
+        className={`${isDark ? 'bg-gray-800' : 'bg-amber-50'} w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col`}
+        style={{ maxHeight: '95vh' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Notepad Header with lines */}
-        <div className={`${isDark ? 'bg-gray-900' : 'bg-amber-100'} p-6 border-b-2 ${isDark ? 'border-gray-700' : 'border-amber-300'}`}>
+        <div className={`${isDark ? 'bg-gray-900' : 'bg-amber-100'} p-6 border-b-2 ${isDark ? 'border-gray-700' : 'border-amber-300'} flex-shrink-0`}>
           <div className="flex justify-between items-center mb-4">
             {isEditing ? (
               <input
@@ -183,9 +184,9 @@ const NotepadView = ({ list, onClose, onSave, isDark }) => {
           <div className={`h-px ${isDark ? 'bg-gray-700' : 'bg-amber-300'} mb-1`}></div>
         </div>
 
-        {/* Notepad Content with ruled lines */}
-        <div className={`${isDark ? 'bg-gray-800' : 'bg-amber-50'} p-8 overflow-y-auto max-h-[calc(90vh-200px)]`}>
-          <div className="relative">
+        {/* Notepad Content with ruled lines - Now scrollable and shows full list */}
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-amber-50'} p-8 overflow-y-auto flex-1 min-h-0`}>
+          <div className="relative min-h-full">
             {/* Ruled paper effect */}
             <div className="absolute inset-0" style={{
               backgroundImage: `repeating-linear-gradient(
@@ -196,19 +197,19 @@ const NotepadView = ({ list, onClose, onSave, isDark }) => {
               )`
             }}></div>
             
-            {/* Content overlay */}
-            <div className="relative z-10 pl-12 handwriting">
-              <div className="space-y-1">
+            {/* Content overlay - Fixed alignment */}
+            <div className="relative z-10 pl-10 pr-4 handwriting">
+              <div className="space-y-2">
                 {items.map((item, index) => (
-                  <div key={item.id} className={`flex items-center gap-3 py-1 ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
+                  <div key={item.id} className={`flex items-center gap-4 py-1.5 ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
                     <button
                       onClick={() => toggleItem(item.id)}
-                      className="flex-shrink-0 mt-1"
+                      className="flex-shrink-0 mt-0.5"
                     >
                       {item.completed ? (
-                        <CheckCircle2 size={20} className="text-green-600" />
+                        <CheckCircle2 size={22} className="text-green-600" />
                       ) : (
-                        <Circle size={20} className={isDark ? 'text-gray-500' : 'text-gray-400'} />
+                        <Circle size={22} className={isDark ? 'text-gray-500' : 'text-gray-400'} />
                       )}
                     </button>
                     <span 
@@ -218,16 +219,17 @@ const NotepadView = ({ list, onClose, onSave, isDark }) => {
                     </span>
                     <button
                       onClick={() => deleteItem(item.id)}
-                      className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors"
+                      className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors p-1"
+                      title="Delete item"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={24} />
                     </button>
                   </div>
                 ))}
                 
                 {/* Add new item */}
-                <div className="flex items-center gap-3 py-1 mt-4">
-                  <Circle size={20} className={`${isDark ? 'text-gray-500' : 'text-gray-400'} opacity-50`} />
+                <div className="flex items-center gap-4 py-1.5 mt-4">
+                  <Circle size={22} className={`${isDark ? 'text-gray-500' : 'text-gray-400'} opacity-50`} />
                   <input
                     type="text"
                     value={newItem}
@@ -239,9 +241,9 @@ const NotepadView = ({ list, onClose, onSave, isDark }) => {
                   {newItem.trim() && (
                     <button
                       onClick={addItem}
-                      className="flex-shrink-0 text-green-600 hover:text-green-700 transition-colors"
+                      className="flex-shrink-0 text-green-600 hover:text-green-700 transition-colors p-1"
                     >
-                      <Plus size={16} />
+                      <Plus size={20} />
                     </button>
                   )}
                 </div>
@@ -251,7 +253,7 @@ const NotepadView = ({ list, onClose, onSave, isDark }) => {
         </div>
 
         {/* Footer with save button */}
-        <div className={`${isDark ? 'bg-gray-900' : 'bg-amber-100'} p-4 border-t-2 ${isDark ? 'border-gray-700' : 'border-amber-300'} flex justify-end`}>
+        <div className={`${isDark ? 'bg-gray-900' : 'bg-amber-100'} p-4 border-t-2 ${isDark ? 'border-gray-700' : 'border-amber-300'} flex justify-end flex-shrink-0`}>
           <button
             onClick={() => {
               handleSave();
