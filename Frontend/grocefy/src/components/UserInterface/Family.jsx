@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import UserNavbar from './UserNavbar.jsx';
+import { useTheme } from '../../context/ThemeContext.jsx';
 import { Plus, Users, ArrowRight, Mail, CheckCircle, LogIn } from 'lucide-react';
 
 // --- MOCK DATA for the Family Hub ---
@@ -20,25 +21,24 @@ const mockRecentActivity = [
 ];
 
 // --- FamilyCard Sub-Component ---
-// The entire card is wrapped in a <Link> component to make it a clickable link
-const FamilyCard = ({ family }) => (
-    <Link to={`/family/${family.id}`} className="block bg-white p-6 rounded-2xl border border-gray-200 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-green-500 group">
+const FamilyCard = ({ family, isDark }) => (
+    <Link to={`/family/${family.id}`} className={`block ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-2xl border shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-green-500 group`}>
         <div className="flex items-center justify-between">
             <div>
-                <h3 className="text-xl font-bold text-gray-800">{family.name}</h3>
-                <p className="text-sm text-gray-500 font-semibold flex items-center gap-2 mt-1">
+                <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>{family.name}</h3>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} font-semibold flex items-center gap-2 mt-1`}>
                     <Users size={16} /> {family.members} Members
                 </p>
             </div>
             <div className="flex -space-x-3">
                 {family.avatars.slice(0, 3).map((avatar, index) => (
-                    <div key={index} className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center font-bold text-gray-600 border-2 border-white">
+                    <div key={index} className={`w-10 h-10 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-full flex items-center justify-center font-bold ${isDark ? 'text-gray-300' : 'text-gray-600'} border-2 ${isDark ? 'border-gray-800' : 'border-white'}`}>
                         {avatar}
                     </div>
                 ))}
             </div>
         </div>
-        <div className="mt-6 w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 font-semibold rounded-lg text-gray-700 group-hover:bg-green-600 group-hover:text-white transition-colors">
+        <div className={`mt-6 w-full flex items-center justify-center gap-2 px-4 py-2 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} font-semibold rounded-lg ${isDark ? 'text-gray-300' : 'text-gray-700'} group-hover:bg-green-600 group-hover:text-white transition-colors`}>
             View Dashboard <ArrowRight size={18} />
         </div>
     </Link>
@@ -47,68 +47,70 @@ const FamilyCard = ({ family }) => (
 
 // --- MAIN FAMILY HUB PAGE ---
 const Family = () => {
+  const { isDarkMode } = useTheme();
+  
   return (
-    <div className="bg-gray-100 min-h-screen font-sans">
+    <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} min-h-screen font-sans transition-colors duration-300`}>
       <UserNavbar />
       <main className="w-full max-w-7xl mx-auto px-6 py-12">
         <header className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-800">Your Family Hub</h1>
-            <p className="text-gray-500 mt-1">Select a family to manage, or create a new one to start collaborating.</p>
+            <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Your Family Hub</h1>
+            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mt-1`}>Select a family to manage, or create a new one to start collaborating.</p>
         </header>
         
         {/* Main Grid: Families + Actions */}
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mockUserFamilies.map(family => (
-                <FamilyCard key={family.id} family={family} />
+                <FamilyCard key={family.id} family={family} isDark={isDarkMode} />
             ))}
             
-            {/* Action Cards -- CHANGE IS HERE */}
-            <Link to="/family/create" className="flex flex-col items-center justify-center text-center p-6 bg-green-50 rounded-2xl border-2 border-dashed border-green-300 text-green-700 hover:bg-green-100 hover:border-green-400 transition">
+            {/* Action Cards */}
+            <Link to="/family/create" className={`flex flex-col items-center justify-center text-center p-6 ${isDarkMode ? 'bg-green-900/30 border-green-700 text-green-300 hover:bg-green-900/50' : 'bg-green-50 border-green-300 text-green-700 hover:bg-green-100'} rounded-2xl border-2 border-dashed hover:border-green-400 transition`}>
                 <Plus size={32} />
-                <h3 className="text-xl font-bold mt-2">Create New Family</h3>
-                <p className="text-sm mt-1">Start a new shared space for lists and expenses.</p>
+                <h3 className={`text-xl font-bold mt-2 ${isDarkMode ? 'text-green-200' : ''}`}>Create New Family</h3>
+                <p className={`text-sm mt-1 ${isDarkMode ? 'text-green-300/70' : ''}`}>Start a new shared space for lists and expenses.</p>
             </Link>
 
-            <div className="flex flex-col items-center justify-center text-center p-6 bg-blue-50 rounded-2xl border-2 border-dashed border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 transition cursor-pointer">
+            <div className={`flex flex-col items-center justify-center text-center p-6 ${isDarkMode ? 'bg-blue-900/30 border-blue-700 text-blue-300 hover:bg-blue-900/50' : 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100'} rounded-2xl border-2 border-dashed hover:border-blue-400 transition cursor-pointer`}>
                 <LogIn size={32} />
-                <h3 className="text-xl font-bold mt-2">Join with Code</h3>
-                <p className="text-sm mt-1">Enter an invite code to join an existing family.</p>
+                <h3 className={`text-xl font-bold mt-2 ${isDarkMode ? 'text-blue-200' : ''}`}>Join with Code</h3>
+                <p className={`text-sm mt-1 ${isDarkMode ? 'text-blue-300/70' : ''}`}>Enter an invite code to join an existing family.</p>
             </div>
         </section>
 
         {/* Pending Invitations Section */}
         <section className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Pending Invitations</h2>
+            <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Pending Invitations</h2>
             {mockInvitations.length > 0 ? (
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+                <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border shadow-sm p-4 transition-colors`}>
                     {mockInvitations.map(invite => (
-                        <div key={invite.id} className="flex flex-col sm:flex-row items-center justify-between p-3 rounded-lg hover:bg-gray-50">
+                        <div key={invite.id} className={`flex flex-col sm:flex-row items-center justify-between p-3 rounded-lg ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'} transition-colors`}>
                             <div className="flex items-center gap-3">
                                 <Mail className="text-blue-500" />
-                                <p className="text-gray-700">
+                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                     You have been invited to join <span className="font-bold">{invite.familyName}</span> by <span className="font-semibold">{invite.invitedBy}</span>.
                                 </p>
                             </div>
                             <div className="flex gap-3 mt-3 sm:mt-0">
-                                <button className="px-4 py-1.5 bg-gray-200 font-semibold rounded-lg text-sm hover:bg-gray-300">Decline</button>
-                                <button className="px-4 py-1.5 bg-green-600 text-white font-semibold rounded-lg text-sm hover:bg-green-500">Accept</button>
+                                <button className={`px-4 py-1.5 ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-200 hover:bg-gray-300'} font-semibold rounded-lg text-sm transition-colors`}>Decline</button>
+                                <button className="px-4 py-1.5 bg-green-600 text-white font-semibold rounded-lg text-sm hover:bg-green-500 transition-colors">Accept</button>
                             </div>
                         </div>
                     ))}
                 </div>
             ) : (
-                <p className="text-gray-500">You have no pending invitations.</p>
+                <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>You have no pending invitations.</p>
             )}
         </section>
 
         {/* Recent Activity Snippet */}
         <section className="mt-12">
-             <h2 className="text-2xl font-bold text-gray-800 mb-4">Recent Activity</h2>
-             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-4">
+             <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Recent Activity</h2>
+             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border shadow-sm p-6 space-y-4 transition-colors`}>
                 {mockRecentActivity.map(activity => (
-                    <div key={activity.id} className="flex items-center gap-3 text-sm">
+                    <div key={activity.id} className={`flex items-center gap-3 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                         <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
-                        <p className="text-gray-600">{activity.text}</p>
+                        <p>{activity.text}</p>
                     </div>
                 ))}
              </div>
