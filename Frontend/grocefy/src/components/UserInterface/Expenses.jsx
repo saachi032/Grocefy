@@ -713,6 +713,18 @@ const Expenses = () => {
                     <Bar dataKey="spending" fill="#10B981" radius={[4, 4, 0, 0]} />
                 </BarChart>
             </ResponsiveContainer>
+
+            {/* --- THIS IS THE ADDED BLOCK --- */}
+            <div className={`mt-4 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                <p className={`text-right text-lg font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Total for {format(currentDate, 'MMMM')}:
+                    <span className={`ml-2 text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        ₹{monthlyTotal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                </p>
+            </div>
+            {/* --- END OF ADDED BLOCK --- */}
+
         </section>
       </main>
 
