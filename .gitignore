@@ -8,6 +8,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Environment files
+node_modules/
 .env
 **/.env
 

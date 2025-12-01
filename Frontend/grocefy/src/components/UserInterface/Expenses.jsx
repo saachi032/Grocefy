@@ -432,13 +432,13 @@ const Expenses = () => {
 
       try {
         const [expensesRes, budgetRes] = await Promise.all([
-          fetch('/api/expenses', {
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/expenses`, {
             headers: {
               'Authorization': `Bearer ${user.token}`,
               'Content-Type': 'application/json',
             },
           }),
-          fetch('/api/budgets', {
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/budgets`, {
             headers: {
               'Authorization': `Bearer ${user.token}`,
               'Content-Type': 'application/json',
@@ -479,7 +479,7 @@ const Expenses = () => {
     }
 
     try {
-      const response = await fetch(`/api/expenses/${expenseId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/expenses/${expenseId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${user.token}`,
@@ -490,7 +490,7 @@ const Expenses = () => {
       if (response.ok) {
         setExpenses(expenses.filter(exp => exp._id !== expenseId));
         // Refresh budget to update spending
-        const budgetRes = await fetch('/api/budgets', {
+        const budgetRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/budgets`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
             'Content-Type': 'application/json',
@@ -516,7 +516,7 @@ const Expenses = () => {
 
     setSavingBudget(true);
     try {
-      const response = await fetch('/api/budgets', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/budgets`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${user.token}`,

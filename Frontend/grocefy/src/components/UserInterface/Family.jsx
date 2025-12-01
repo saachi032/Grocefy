@@ -116,7 +116,7 @@ const Family = () => {
 
       try {
         const [familiesRes, invitationsRes] = await Promise.all([
-          fetch('/api/families', {
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/families`, {
             headers: {
               'Authorization': `Bearer ${user.token}`,
               'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ const Family = () => {
         setSuccess(`Successfully joined ${data.family.name}!`);
         setShowJoinModal(false);
         // Refresh families list
-        const familiesRes = await fetch('/api/families', {
+        const familiesRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/families`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
             'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ const Family = () => {
     if (!user?.token) return;
 
     try {
-      const response = await fetch(`/api/families/invitations/${invitationId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/families/invitations/${invitationId}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${user.token}`,
@@ -217,13 +217,13 @@ const Family = () => {
       if (data.success) {
         // Refresh data
         const [familiesRes, invitationsRes] = await Promise.all([
-          fetch('/api/families', {
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/families`, {
             headers: {
               'Authorization': `Bearer ${user.token}`,
               'Content-Type': 'application/json',
             },
           }),
-          fetch('/api/families/invitations', {
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/families/invitations`, {
             headers: {
               'Authorization': `Bearer ${user.token}`,
               'Content-Type': 'application/json',

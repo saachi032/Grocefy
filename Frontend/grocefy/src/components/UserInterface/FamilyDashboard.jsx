@@ -63,7 +63,7 @@ const FamilyDashboard = () => {
       }
 
       try {
-        const response = await fetch(`/api/families/${familyId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/families/${familyId}`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
             'Content-Type': 'application/json',

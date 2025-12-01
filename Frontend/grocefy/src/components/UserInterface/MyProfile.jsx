@@ -121,7 +121,7 @@ const MyProfile = () => {
             }
 
             try {
-                const response = await fetch('/api/users/profile', {
+                const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/profile`, {
                     headers: {
                         'Authorization': `Bearer ${user.token}`,
                         'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const MyProfile = () => {
 
         setSaving(true);
         try {
-            const response = await fetch('/api/users/profile', {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/profile`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,

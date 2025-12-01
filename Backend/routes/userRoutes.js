@@ -9,3 +9,8 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 
 module.exports = router;
+
+//POST → create something
+//GET → fetch something
+//PUT/PATCH → update something
+//DELETE → delete something

@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (email, password) => {
     try {
-      const { data } = await axios.post('/api/users/login', { email, password });
+      const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/users/login`, { email, password });
       localStorage.setItem('userInfo', JSON.stringify(data));
       setUser(data);
       return data; // Return user data on success
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   // Signup function
   const signup = async (name, email, password) => {
      try {
-      const { data } = await axios.post('/api/users/register', { name, email, password });
+      const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/users/register`, { name, email, password });
       localStorage.setItem('userInfo', JSON.stringify(data));
       setUser(data);
       return data;

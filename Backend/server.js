@@ -2,12 +2,14 @@ const express = require('express');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db.js');
 const userRoutes = require('./routes/userRoutes.js');
+const expenseRoutes = require('./routes/expenseRoutes.js');
 const cors = require('cors');
 
-// ... (rest of your server.js file)
 
 // Load environment variables from .env file
 dotenv.config();
+console.log("MONGO_URI =", process.env.MONGO_URI);
+
 
 // Connect to the database
 connectDB();
@@ -27,8 +29,9 @@ app.get('/', (req, res) => {
 
 // Use the user routes for any requests to /api/users
 app.use('/api/users', userRoutes);
+app.use('/api/expenses', require('./routes/expenseRoutes.js'));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
