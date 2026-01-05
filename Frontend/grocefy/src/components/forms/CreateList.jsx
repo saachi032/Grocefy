@@ -1,34 +1,74 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import UserNavbar from '../UserInterface/UserNavbar.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { 
     Users, User, Share2, ArrowLeft, X,
     DollarSign, Zap, PartyPopper, ShoppingCart
 } from 'lucide-react';
 
 const CreateList = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [listName, setListName] = useState('');
   const [listType, setListType] = useState('Individual');
   const [description, setDescription] = useState('');
   const [budget, setBudget] = useState('');
   const [color, setColor] = useState('#10B981'); // Default Grocefy Green
   const [icon, setIcon] = useState('ShoppingCart');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   
   // State for email chip input
   const [emails, setEmails] = useState([]);
   const [emailInput, setEmailInput] = useState('');
-  
-  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    
     if (!listName) {
-      alert('Please provide a list name.');
+      setError('Please provide a list name.');
       return;
     }
-    const formData = { listName, listType, description, budget, color, icon, sharedWith: emails };
-    console.log('Form Submitted:', formData);
-    navigate('/lists');
+
+    if (!user?.token) {
+      setError('Please log in to create a list');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/lists`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({
+          name: listName,
+          items: [],
+          status: 'Active',
+          isShared: listType === 'Shared',
+          color: color,
+          icon: icon,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        navigate('/lists');
+      } else {
+        setError(data.message || 'Failed to create list');
+      }
+    } catch (error) {
+      console.error('Error creating list:', error);
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEmailKeyDown = (e) => {
@@ -66,13 +106,18 @@ const CreateList = () => {
                 <button type="button" onClick={() => navigate('/lists')} className="px-6 py-2 bg-white border font-semibold text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
                     Cancel
                 </button>
-                <button form="create-list-form" type="submit" className="px-8 py-2 bg-green-600 font-bold text-white rounded-lg hover:bg-green-500 transition-colors">
-                    Create List
+                <button form="create-list-form" type="submit" disabled={loading} className="px-8 py-2 bg-green-600 font-bold text-white rounded-lg hover:bg-green-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    {loading ? 'Creating...' : 'Create List'}
                 </button>
             </div>
         </div>
 
         <form id="create-list-form" onSubmit={handleSubmit} className="grid grid-cols-1 gap-8">
+            {error && (
+              <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-2 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
             
             {/* Card 1: The Essentials */}
             <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">

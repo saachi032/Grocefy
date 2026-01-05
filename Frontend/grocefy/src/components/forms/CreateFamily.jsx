@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import UserNavbar from '../UserInterface/UserNavbar.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import {
     Users, FileText, Wallet, Mail, Lock, Check,
     Plus, PartyPopper, Copy, ArrowRight, X
@@ -8,6 +9,7 @@ import {
 
 const CreateFamily = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     // Form state
     const [familyName, setFamilyName] = useState('');
@@ -22,6 +24,8 @@ const CreateFamily = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [familyCode, setFamilyCode] = useState('');
     const [copied, setCopied] = useState(false); // State for the "copied" message
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const familyEmojis = ['🏡', '👨‍👩‍👧‍👦', '⭐', '🏆', '😎', '❤️'];
 
@@ -42,13 +46,48 @@ const CreateFamily = () => {
         setEmails(emails.filter((_, index) => index !== indexToRemove));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const formData = { familyName, description, budget, selectedEmoji, visibility, members: emails };
-        console.log('Family Created:', formData);
-        const generatedCode = 'A3B-7K9-P2X';
-        setFamilyCode(generatedCode);
-        setIsSubmitted(true);
+        setError('');
+        setLoading(true);
+
+        if (!user?.token) {
+            setError('Please log in to create a family');
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/family`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`,
+                },
+                body: JSON.stringify({
+                    familyName,
+                    description,
+                    budget: budget ? parseFloat(budget) : 0,
+                    selectedEmoji,
+                    visibility,
+                    members: emails,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                setFamilyCode(data.familyCode);
+                setIsSubmitted(true);
+            } else {
+                setError(data.message || 'Failed to create family');
+            }
+        } catch (error) {
+            console.error('Error creating family:', error);
+            setError('Network error. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     // --- NEW: Function to handle copying and redirecting ---
@@ -122,6 +161,11 @@ const CreateFamily = () => {
                     </p>
                 </div>
                 <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm space-y-6">
+                    {error && (
+                        <div className="mb-4 bg-red-50 border border-red-300 text-red-700 px-4 py-2 rounded-lg text-sm">
+                            {error}
+                        </div>
+                    )}
                     <div>
                         <label htmlFor="familyName" className="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2"><Users size={16} /> Family Name</label>
                         <input type="text" id="familyName" value={familyName} onChange={(e) => setFamilyName(e.target.value)} placeholder="e.g., The Sharma Household" className="w-full text-lg px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required/>
@@ -170,8 +214,8 @@ const CreateFamily = () => {
                     </div>
                     <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-4 pt-4 border-t border-gray-200 mt-2">
                         <Link to="/family" className="font-semibold text-gray-600 hover:text-gray-800">Back to Family Hub</Link>
-                        <button type="submit" className="w-full sm:w-auto px-8 py-3 bg-green-600 font-bold text-white rounded-lg hover:bg-green-500 transition-colors shadow-sm hover:shadow-md">
-                            Create Family
+                        <button type="submit" disabled={loading} className="w-full sm:w-auto px-8 py-3 bg-green-600 font-bold text-white rounded-lg hover:bg-green-500 transition-colors shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                            {loading ? 'Creating...' : 'Create Family'}
                         </button>
                     </div>
                 </form>

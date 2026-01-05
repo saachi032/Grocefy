@@ -24,6 +24,18 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+
+    // Phone number (optional)
+    phone: {
+      type: String,
+      default: '',
+    },
+
+    // Avatar emoji (optional)
+    avatar: {
+      type: String,
+      default: '🧑',
+    },
   },
   {
     // timestamps: true automatically adds `createdAt` and `updatedAt`

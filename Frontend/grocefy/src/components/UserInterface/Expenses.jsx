@@ -10,7 +10,9 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import UserNavbar from './UserNavbar.jsx';
 import { Plus, ChevronLeft, ChevronRight, Calendar, CreditCard, Wallet, Landmark, Trash2, Target, Settings, X, Save, TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
 
-const PaymentInfo = ({ method }) => {
+console.log(import.meta.env.VITE_API_BASE_URL);
+
+const PaymentInfo = ({ method }) => { 
     let Icon;
     switch (method) {
         case 'Card': Icon = CreditCard; break;
@@ -39,13 +41,10 @@ const CustomTooltip = ({ active, payload }) => {
 
 // Budget Setup Modal Component
 const BudgetSetupModal = ({ isOpen, onClose, onSave, budget, isDark, saving }) => {
-  const [activeTab, setActiveTab] = useState('weekly');
-  const [weeklyBudget, setWeeklyBudget] = useState(budget?.weeklyBudget || 0);
   const [monthlyBudget, setMonthlyBudget] = useState(budget?.monthlyBudget || 0);
 
   useEffect(() => {
     if (budget) {
-      setWeeklyBudget(budget.weeklyBudget || 0);
       setMonthlyBudget(budget.monthlyBudget || 0);
     }
   }, [budget, isOpen]);
@@ -54,7 +53,6 @@ const BudgetSetupModal = ({ isOpen, onClose, onSave, budget, isDark, saving }) =
 
   const handleSave = () => {
     onSave({
-      weeklyBudget: parseFloat(weeklyBudget) || 0,
       monthlyBudget: parseFloat(monthlyBudget) || 0,
     });
   };
@@ -71,9 +69,9 @@ const BudgetSetupModal = ({ isOpen, onClose, onSave, budget, isDark, saving }) =
             <div>
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 <Target size={24} />
-                Set Up Budget
+                Set Up Monthly Budget
               </h2>
-              <p className="text-green-100 mt-1">Track your spending with weekly or monthly limits</p>
+              <p className="text-green-100 mt-1">Track your monthly spending with a budget limit</p>
             </div>
             <button
               onClick={onClose}
@@ -84,111 +82,46 @@ const BudgetSetupModal = ({ isOpen, onClose, onSave, budget, isDark, saving }) =
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className={`flex border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-          <button
-            onClick={() => setActiveTab('weekly')}
-            className={`flex-1 px-6 py-4 font-semibold transition-colors ${
-              activeTab === 'weekly'
-                ? `${isDark ? 'text-green-400 border-b-2 border-green-400' : 'text-green-600 border-b-2 border-green-600'}`
-                : `${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`
-            }`}
-          >
-            Weekly Budget
-          </button>
-          <button
-            onClick={() => setActiveTab('monthly')}
-            className={`flex-1 px-6 py-4 font-semibold transition-colors ${
-              activeTab === 'monthly'
-                ? `${isDark ? 'text-green-400 border-b-2 border-green-400' : 'text-green-600 border-b-2 border-green-600'}`
-                : `${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`
-            }`}
-          >
-            Monthly Budget
-          </button>
-        </div>
-
         {/* Content */}
         <div className="p-6">
-          {activeTab === 'weekly' ? (
-            <div className="space-y-6">
-              <div>
-                <label className={`block text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                  Weekly Budget Amount
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-400">₹</span>
-                  <input
-                    type="number"
-                    value={weeklyBudget}
-                    onChange={(e) => setWeeklyBudget(e.target.value)}
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0"
-                    className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 focus:ring-2 focus:ring-green-500 outline-none transition-all ${
-                      isDark 
-                        ? 'bg-gray-700 border-gray-600 text-white focus:border-green-500' 
-                        : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
-                    }`}
-                  />
+          <div className="space-y-6">
+            <div>
+              <label className={`block text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+                Monthly Budget Amount
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-400">₹</span>
+                <input
+                  type="number"
+                  value={monthlyBudget}
+                  onChange={(e) => setMonthlyBudget(e.target.value)}
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 focus:ring-2 focus:ring-green-500 outline-none transition-all ${
+                    isDark 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-green-500' 
+                      : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
+                  }`}
+                />
+              </div>
+              <p className={`text-xs mt-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                Set your maximum spending limit for each month
+              </p>
+            </div>
+
+            {monthlyBudget > 0 && (
+              <div className={`${isDark ? 'bg-green-900/20 border-green-700' : 'bg-green-50 border-green-200'} border rounded-xl p-4`}>
+                <div className="flex items-center gap-2 text-green-700 dark:text-green-300 mb-2">
+                  <Target size={18} />
+                  <span className="font-semibold">Budget Preview</span>
                 </div>
-                <p className={`text-xs mt-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Set your maximum spending limit for each week
+                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Your monthly budget is set to <span className="font-bold text-green-600 dark:text-green-400">₹{parseFloat(monthlyBudget || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                 </p>
               </div>
-
-              {weeklyBudget > 0 && (
-                <div className={`${isDark ? 'bg-green-900/20 border-green-700' : 'bg-green-50 border-green-200'} border rounded-xl p-4`}>
-                  <div className="flex items-center gap-2 text-green-700 dark:text-green-300 mb-2">
-                    <Target size={18} />
-                    <span className="font-semibold">Budget Preview</span>
-                  </div>
-                  <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Your weekly budget is set to <span className="font-bold text-green-600 dark:text-green-400">₹{parseFloat(weeklyBudget || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                  </p>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <div>
-                <label className={`block text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
-                  Monthly Budget Amount
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-400">₹</span>
-                  <input
-                    type="number"
-                    value={monthlyBudget}
-                    onChange={(e) => setMonthlyBudget(e.target.value)}
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0"
-                    className={`w-full pl-12 pr-4 py-4 text-2xl font-bold rounded-xl border-2 focus:ring-2 focus:ring-green-500 outline-none transition-all ${
-                      isDark 
-                        ? 'bg-gray-700 border-gray-600 text-white focus:border-green-500' 
-                        : 'bg-gray-50 border-gray-300 text-gray-900 focus:border-green-500'
-                    }`}
-                  />
-                </div>
-                <p className={`text-xs mt-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Set your maximum spending limit for each month
-                </p>
-              </div>
-
-              {monthlyBudget > 0 && (
-                <div className={`${isDark ? 'bg-green-900/20 border-green-700' : 'bg-green-50 border-green-200'} border rounded-xl p-4`}>
-                  <div className="flex items-center gap-2 text-green-700 dark:text-green-300 mb-2">
-                    <Target size={18} />
-                    <span className="font-semibold">Budget Preview</span>
-                  </div>
-                  <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Your monthly budget is set to <span className="font-bold text-green-600 dark:text-green-400">₹{parseFloat(monthlyBudget || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
@@ -223,8 +156,8 @@ const BudgetSetupModal = ({ isOpen, onClose, onSave, budget, isDark, saving }) =
 };
 
 // Budget Status Card Component
-const BudgetStatusCard = ({ budget, spending, period, isDark, onSetup }) => {
-  const budgetAmount = period === 'weekly' ? budget?.weeklyBudget : budget?.monthlyBudget;
+const BudgetStatusCard = ({ budget, spending, isDark, onSetup }) => {
+  const budgetAmount = budget?.monthlyBudget || 0;
   const remaining = budgetAmount > 0 ? budgetAmount - spending : 0;
   const percentage = budgetAmount > 0 ? (spending / budgetAmount) * 100 : 0;
   const isOverBudget = spending > budgetAmount;
@@ -236,6 +169,38 @@ const BudgetStatusCard = ({ budget, spending, period, isDark, onSetup }) => {
         ? 'yellow' 
         : 'green';
 
+  // Generate status message based on budget progress
+  const getStatusMessage = () => {
+    if (isOverBudget) {
+      return {
+        title: 'Budget Exceeded!',
+        message: `You've exceeded your budget by ₹${Math.abs(remaining).toLocaleString('en-IN', { minimumFractionDigits: 2 })}. Consider reviewing your expenses.`,
+        icon: TrendingUp,
+      };
+    } else if (percentage >= 90) {
+      return {
+        title: 'Almost There!',
+        message: `Only ₹${remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 })} left until your budget limit. Spend wisely!`,
+        icon: AlertCircle,
+      };
+    } else if (percentage >= 75) {
+      return {
+        title: 'Getting Close',
+        message: `You have ₹${remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 })} remaining. Keep monitoring your spending.`,
+        icon: TrendingUp,
+      };
+    } else {
+      return {
+        title: 'Great Job!',
+        message: `You have ₹${remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 })} remaining. You're well within your budget!`,
+        icon: TrendingDown,
+      };
+    }
+  };
+
+  const statusMsg = getStatusMessage();
+  const StatusIcon = statusMsg.icon;
+
   if (!budgetAmount || budgetAmount === 0) {
     return (
       <div className={`${isDark ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700' : 'bg-gradient-to-br from-white to-gray-50 border-gray-200'} border rounded-2xl p-6 shadow-lg transition-all hover:shadow-xl`}>
@@ -246,7 +211,7 @@ const BudgetStatusCard = ({ budget, spending, period, isDark, onSetup }) => {
             </div>
             <div>
               <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
-                {period === 'weekly' ? 'Weekly' : 'Monthly'} Budget
+                Monthly Budget
               </h3>
               <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Not set up yet</p>
             </div>
@@ -282,10 +247,10 @@ const BudgetStatusCard = ({ budget, spending, period, isDark, onSetup }) => {
           </div>
           <div>
             <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
-              {period === 'weekly' ? 'Weekly' : 'Monthly'} Budget
+              Monthly Budget
             </h3>
             <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-              {isOverBudget ? 'Over budget' : `${remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 })} remaining`}
+              {isOverBudget ? 'Over budget' : `₹${remaining.toLocaleString('en-IN', { minimumFractionDigits: 2 })} remaining`}
             </p>
           </div>
         </div>
@@ -348,63 +313,25 @@ const BudgetStatusCard = ({ budget, spending, period, isDark, onSetup }) => {
         statusColor === 'orange' ? `${isDark ? 'bg-orange-900/20 border-orange-700' : 'bg-orange-50 border-orange-200'}` :
         `${isDark ? 'bg-red-900/20 border-red-700' : 'bg-red-50 border-red-200'}`
       } border rounded-lg p-3 flex items-start gap-2`}>
-        {isOverBudget ? (
-          <>
-            <TrendingUp size={18} className="text-red-600 dark:text-red-400 mt-0.5" />
-            <div>
-              <p className={`text-sm font-semibold ${
-                statusColor === 'red' ? 'text-red-700 dark:text-red-300' : ''
-              }`}>
-                Budget Exceeded!
-              </p>
-              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                You've exceeded your budget. Consider reviewing your expenses.
-              </p>
-            </div>
-          </>
-        ) : percentage >= 90 ? (
-          <>
-            <AlertCircle size={18} className="text-orange-600 dark:text-orange-400 mt-0.5" />
-            <div>
-              <p className={`text-sm font-semibold ${
-                statusColor === 'orange' ? 'text-orange-700 dark:text-orange-300' : ''
-              }`}>
-                Almost There!
-              </p>
-              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                You're close to your budget limit. Spend wisely!
-              </p>
-            </div>
-          </>
-        ) : percentage >= 75 ? (
-          <>
-            <TrendingUp size={18} className="text-yellow-600 dark:text-yellow-400 mt-0.5" />
-            <div>
-              <p className={`text-sm font-semibold ${
-                statusColor === 'yellow' ? 'text-yellow-700 dark:text-yellow-300' : ''
-              }`}>
-                On Track
-              </p>
-              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                You're doing well! Keep monitoring your spending.
-              </p>
-            </div>
-          </>
-        ) : (
-          <>
-            <TrendingDown size={18} className="text-green-600 dark:text-green-400 mt-0.5" />
-            <div>
-              <p className={`text-sm font-semibold ${
-                statusColor === 'green' ? 'text-green-700 dark:text-green-300' : ''
-              }`}>
-                Great Job!
-              </p>
-              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
-                You're well within your budget. Keep it up!
-              </p>
-            </div>
-          </>
-        )}
+        <StatusIcon size={18} className={`${
+          statusColor === 'green' ? 'text-green-600 dark:text-green-400' :
+          statusColor === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
+          statusColor === 'orange' ? 'text-orange-600 dark:text-orange-400' :
+          'text-red-600 dark:text-red-400'
+        } mt-0.5`} />
+        <div>
+          <p className={`text-sm font-semibold ${
+            statusColor === 'green' ? 'text-green-700 dark:text-green-300' :
+            statusColor === 'yellow' ? 'text-yellow-700 dark:text-yellow-300' :
+            statusColor === 'orange' ? 'text-orange-700 dark:text-orange-300' :
+            'text-red-700 dark:text-red-300'
+          }`}>
+            {statusMsg.title}
+          </p>
+          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>
+            {statusMsg.message}
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -620,19 +547,11 @@ const Expenses = () => {
             </div>
         </header>
 
-        {/* Budget Status Cards */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <BudgetStatusCard
-            budget={budget}
-            spending={weeklyTotal}
-            period="weekly"
-            isDark={isDarkMode}
-            onSetup={() => setShowBudgetModal(true)}
-          />
+        {/* Budget Status Card */}
+        <section className="mb-8">
           <BudgetStatusCard
             budget={budget}
             spending={monthlyTotal}
-            period="monthly"
             isDark={isDarkMode}
             onSetup={() => setShowBudgetModal(true)}
           />

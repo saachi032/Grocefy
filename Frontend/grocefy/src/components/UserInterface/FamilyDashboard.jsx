@@ -63,7 +63,7 @@ const FamilyDashboard = () => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/families/${familyId}`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/family/${familyId}`, {
           headers: {
             'Authorization': `Bearer ${user.token}`,
             'Content-Type': 'application/json',
@@ -77,9 +77,13 @@ const FamilyDashboard = () => {
         const data = await response.json();
         if (data.success) {
           setFamilyData(data.family);
+        } else {
+          console.error('Failed to fetch family data:', data.message);
+          setFamilyData(null);
         }
       } catch (error) {
         console.error('Error fetching family data:', error);
+        setFamilyData(null);
       } finally {
         setLoading(false);
       }
@@ -196,7 +200,14 @@ const FamilyDashboard = () => {
             <div>
                 <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Members</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {members.map(m => <MemberCard key={m.id} member={m} isDark={isDarkMode} />)}
+                    {members && members.length > 0 ? (
+                      members.map(m => <MemberCard key={m.id} member={m} isDark={isDarkMode} />)
+                    ) : (
+                      <div className={`col-span-2 text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <Users size={32} className="mx-auto mb-2 opacity-50" />
+                        <p>No members yet</p>
+                      </div>
+                    )}
                 </div>
             </div>
             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-2xl border shadow-sm transition-colors`}>

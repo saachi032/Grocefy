@@ -30,6 +30,12 @@ app.get('/', (req, res) => {
 // Use the user routes for any requests to /api/users
 app.use('/api/users', userRoutes);
 app.use('/api/expenses', require('./routes/expenseRoutes.js'));
+app.use('/api/budgets', require('./routes/budgetRoutes.js'));
+app.use("/api/family", require("./routes/familyRoutes"));
+app.use("/api/family/invitations", require("./routes/invitationRoutes"));
+app.use("/api/lists", require("./routes/listRoutes"));
+
+
 
 const PORT = process.env.PORT || 5002;
 

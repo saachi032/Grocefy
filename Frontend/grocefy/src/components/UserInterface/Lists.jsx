@@ -1,14 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import UserNavbar from './UserNavbar.jsx';
 import { useTheme } from '../../context/ThemeContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import { 
   Search, Plus, CheckCircle2, Users, ChevronDown, 
   Eye, Pencil, Trash2, ShoppingCart, PartyPopper, Zap,
   X, Save, Circle
 } from 'lucide-react';
 
-// --- UPDATED MOCK DATA with items ---
+// --- REMOVED MOCK DATA - using real data from backend ---
 const mockLists = [
   { 
     id: 1, 
@@ -343,11 +344,65 @@ const ListCard = ({ list, onView, onEdit, onDelete, isDark }) => {
 
 const Lists = () => {
   const { isDarkMode } = useTheme();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('All');
-  const [lists, setLists] = useState(mockLists);
+  const [lists, setLists] = useState([]);
   const [selectedList, setSelectedList] = useState(null);
   const [viewMode, setViewMode] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch lists from backend
+  useEffect(() => {
+    const fetchLists = async () => {
+      if (!user?.token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/lists`, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            // Format lastUpdated to relative time
+            const formattedLists = data.lists.map(list => ({
+              ...list,
+              lastUpdated: formatRelativeTime(new Date(list.lastUpdated)),
+            }));
+            setLists(formattedLists);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching lists:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLists();
+  }, [user]);
+
+  // Helper function to format relative time
+  const formatRelativeTime = (date) => {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'} ago`;
+    if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+    if (diffDays < 7) return `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+    return date.toLocaleDateString();
+  };
 
   const filteredLists = useMemo(() => {
     return lists
@@ -369,22 +424,91 @@ const Lists = () => {
     setViewMode('edit');
   };
 
-  const handleDelete = (listId) => {
-    if (window.confirm('Are you sure you want to delete this list?')) {
-      setLists(lists.filter(l => l.id !== listId));
+  const handleDelete = async (listId) => {
+    if (!window.confirm('Are you sure you want to delete this list?')) {
+      return;
+    }
+
+    if (!user?.token) return;
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/lists/${listId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        setLists(lists.filter(l => l.id !== listId));
+      } else {
+        alert('Failed to delete list');
+      }
+    } catch (error) {
+      console.error('Error deleting list:', error);
+      alert('Error deleting list');
     }
   };
 
-  const handleSave = (updatedList) => {
-    setLists(lists.map(l => l.id === updatedList.id ? updatedList : l));
-    setSelectedList(null);
-    setViewMode(null);
+  const handleSave = async (updatedList) => {
+    if (!user?.token) return;
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/lists/${updatedList.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${user.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: updatedList.name,
+          items: updatedList.items,
+          status: updatedList.status,
+          isShared: updatedList.isShared,
+          color: updatedList.color,
+          icon: updatedList.icon,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          const formattedList = {
+            ...data.list,
+            lastUpdated: formatRelativeTime(new Date(data.list.lastUpdated)),
+          };
+          setLists(lists.map(l => l.id === formattedList.id ? formattedList : l));
+          setSelectedList(null);
+          setViewMode(null);
+        }
+      } else {
+        alert('Failed to save list');
+      }
+    } catch (error) {
+      console.error('Error saving list:', error);
+      alert('Error saving list');
+    }
   };
 
   const handleClose = () => {
     setSelectedList(null);
     setViewMode(null);
   };
+
+  if (loading) {
+    return (
+      <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} min-h-screen font-sans transition-colors duration-300`}>
+        <UserNavbar />
+        <main className="w-full max-w-7xl mx-auto px-6 py-12 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>Loading lists...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} min-h-screen font-sans transition-colors duration-300`}>
@@ -459,8 +583,24 @@ const Lists = () => {
             ))
           ) : (
             <div className={`lg-col-span-3 text-center py-16 px-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl border transition-colors`}>
-              <h3 className={`text-xl font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>No lists found</h3>
-              <p className={`${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>Try adjusting your search or filter to find what you're looking for.</p>
+              <ShoppingCart size={48} className={`mx-auto mb-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+              <h3 className={`text-xl font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                {lists.length === 0 ? 'No lists yet' : 'No lists found'}
+              </h3>
+              <p className={`${isDarkMode ? 'text-gray-500' : 'text-gray-500'} mt-2`}>
+                {lists.length === 0 
+                  ? 'Create your first grocery list to get started!' 
+                  : 'Try adjusting your search or filter to find what you are looking for.'}
+              </p>
+              {lists.length === 0 && (
+                <Link 
+                  to="/lists/create" 
+                  className="inline-flex items-center gap-2 mt-4 px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-500 transition-transform transform hover:scale-105 shadow-sm"
+                >
+                  <Plus size={20}/>
+                  Create Your First List
+                </Link>
+              )}
             </div>
           )}
         </section>
