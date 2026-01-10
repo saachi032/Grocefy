@@ -2,7 +2,7 @@
 
 Grocefy is a modern web app that helps families manage groceries, shared lists, and expenses — all in one place.
 
-🔗 **Use it directly here:** [https://grocefy-three.vercel.app](https://grocefy-three.vercel.app)
+🔗 **Use it directly here:** [https://grocefy-three.vercel.app](https://grocefy-ebon.vercel.app)
 
 ---
 
